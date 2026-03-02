@@ -2,16 +2,18 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import NavBar from "./components/NavBar";
-import SignIn from "./pages/SignIn/SignIn";
-import ForgotPassword from "./pages/SignIn/ForgotPassword";
-import ResetPassword from "./pages/SignIn/ResetPassword";
-import CreateAccount from "./pages/SignIn/SignUp";
+import SignIn from "./pages/Auth/SignIn";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
+import CreateAccount from "./pages/Auth/SignUp";
 import Services from "./pages/Service/Services";
 import BookService from "./pages/Service/BookService";
 import Profile from "./pages/Profile/Profile";
 import AddPet from "./pages/Profile/AddPet";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PhotoLibrary from "./pages/PhotoLibrary";
+import PetProfile from "./pages/Profile/PetProfile";
+import EditPetProfile from "./pages/Profile/EditPetProfile";
 import "./styles/globals.css";
 
 export default function App() {
@@ -56,6 +58,24 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <BookService />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pet/:petId"
+            element={
+              <ProtectedRoute>
+                <PetProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pet/:petId/edit"
+            element={
+              <ProtectedRoute>
+                <EditPetProfile />
               </ProtectedRoute>
             }
           />

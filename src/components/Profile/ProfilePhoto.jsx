@@ -1,8 +1,6 @@
+import HoverPencilIcon from "..//HoverPencilIcon";
+import { Avatar, Box } from "@mui/material";
 import { useState } from "react";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import EditIcon from "@mui/icons-material/Edit";
-import logo from "../../assets/logo.png";
 
 export default function ProfilePhoto({ currentUrl, onChange }) {
   const [preview, setPreview] = useState(null);
@@ -12,8 +10,7 @@ export default function ProfilePhoto({ currentUrl, onChange }) {
     onChange(file);
 
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
+      setPreview(URL.createObjectURL(file));
     } else {
       setPreview(null);
     }
@@ -44,26 +41,7 @@ export default function ProfilePhoto({ currentUrl, onChange }) {
         }}
       />
 
-      {/* Hover Pencil */}
-      <Box
-        className="edit-icon"
-        sx={{
-          position: "absolute",
-          bottom: 6,
-          right: 6,
-          width: 34,
-          height: 34,
-          borderRadius: "50%",
-          backgroundColor: "#980061",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: 0,
-          transition: "opacity 0.25s ease",
-        }}
-      >
-        <EditIcon sx={{ color: "white", fontSize: 18 }} />
-      </Box>
+      <HoverPencilIcon />
 
       <input
         type="file"

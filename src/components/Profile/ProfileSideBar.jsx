@@ -1,6 +1,5 @@
 import { Box, Typography, Button } from "@mui/material";
 import ProfilePhoto from "./ProfilePhoto";
-import { plumButton } from "../../styles/buttonStyles";
 import { supabase } from "../../utils/supabase";
 
 export default function ProfileSidebar({ user, profile, onEdit, onLogout }) {
@@ -31,8 +30,6 @@ export default function ProfileSidebar({ user, profile, onEdit, onLogout }) {
       console.error(updateError);
       return;
     }
-
-    // No reload. No refreshSession. Your profile hook will pick up the new path.
   };
 
   return (
@@ -61,19 +58,17 @@ export default function ProfileSidebar({ user, profile, onEdit, onLogout }) {
 
       <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}>
         <Button
-          variant="outlined"
+          variant="plum-contained"
           size="large"
           onClick={onEdit}
-          sx={{ ...plumButton(true), width: "100%" }}
         >
           Edit Profile
         </Button>
 
         <Button
-          variant="outlined"
+          variant="plum-contained"
           size="large"
           onClick={onLogout}
-          sx={{ ...plumButton(true), width: "100%" }}
         >
           Log Out
         </Button>

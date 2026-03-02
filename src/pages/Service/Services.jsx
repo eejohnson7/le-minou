@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import ServiceList from "../../components/ServiceList";
 import { SERVICES } from "../../data/services";
-import { plumButton } from "../../styles/buttonStyles";
 
 export default function Services() {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export default function Services() {
 
   return (
     <Box sx={{ maxWidth: "700px", margin: "4rem auto", padding: "0 2rem", color: "#980061" }}>
-      <Typography variant="h2" sx={{ fontSize: "3rem", marginBottom: "2rem", textAlign: "center" }}>
+      <Typography sx={{ fontSize: "3rem", marginBottom: "2rem", textAlign: "center" }}>
         Services & Rates
       </Typography>
 
@@ -36,16 +35,14 @@ export default function Services() {
         {isSignedIn ? (
           <Button
             onClick={() => navigate("/book-service")}
-            variant="contained"
-            sx={plumButton(true)}
+            variant="plum-contained"
           >
             Book a Service
           </Button>
         ) : (
           <Button
             onClick={() => navigate("/sign-in")}
-            variant="outlined"
-            sx={plumButton(false)}
+            variant="plum-outlined"
           >
             Sign in to Book
           </Button>

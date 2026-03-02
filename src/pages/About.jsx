@@ -3,13 +3,13 @@ import Box from "@mui/material/Box";
 
 export default function About() {
   return (
-    <main style={{ maxWidth: "720px", margin: "0 auto", padding: "2rem" }}>
-      <Typography sx={{ fontSize: "4rem", color: "#980061" }}>
+    <main style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem" }}>
+      <Typography sx={{ fontSize: "3rem"}}>
         About Le Minou
       </Typography>
 
       {/* Section 1 */}
-      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem", color: "#980061" }}>
+      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem" }}>
         How It Began
       </Typography>
       <Box
@@ -63,7 +63,7 @@ export default function About() {
       </Box>
 
       {/* Section 4 */}
-      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem", color: "#980061" }}>
+      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem" }}>
         What Le Minou Offers
       </Typography>
       <Box
@@ -81,7 +81,7 @@ export default function About() {
       </Box>
 
       {/* Section 5 */}
-      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem", color: "#980061" }}>
+      <Typography sx={{ fontSize: "1.8rem", marginTop: "2rem" }}>
         What Guides My Work
       </Typography>
       <Box

@@ -1,82 +1,58 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../../utils/supabase";
+import { useVets } from "../../hooks/useVets";
+import { useVetForm } from "../../hooks/useVetForm";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import { plumButton } from "../../styles/buttonStyles";
+import { Typography, TextField, MenuItem } from "@mui/material";
 
 export default function VetSelector({ user, onChange }) {
-  const [existingVets, setExistingVets] = useState([]);
+  const userId = user.id;
+
+  const { vets: existingVets, loading: loadingVets } = useVets(userId);
+
   const [useExistingVet, setUseExistingVet] = useState(true);
   const [selectedVetId, setSelectedVetId] = useState("");
 
-  // New vet fields
-  const [vetName, setVetName] = useState("");
-  const [clinicName, setClinicName] = useState("");
-  const [street1, setStreet1] = useState("");
-  const [street2, setStreet2] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [phone, setPhone] = useState("");
+  const { fields, setters, newVet, reset } = useVetForm();
 
   useEffect(() => {
-    if (!user) return;
+    if (existingVets.length === 0 && useExistingVet !== false) {
+      setUseExistingVet(false);
+    }
+  }, [existingVets, useExistingVet]);
 
-    const loadVets = async () => {
-      const { data, error } = await supabase
-        .from("veterinarian")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("vet_name");
-
-      if (!error) {
-        setExistingVets(data);
-        if (data.length === 0) {
-          setUseExistingVet(false);
-        }
-      }
-    };
-
-    loadVets();
-  }, [user]);
-
-  // Notify parent whenever selection changes
   useEffect(() => {
     if (useExistingVet) {
       onChange({ vetId: selectedVetId });
     } else {
-      onChange({
-        newVet: {
-          vet_name: vetName,
-          clinic_name: clinicName,
-          street_line_1: street1,
-          street_line_2: street2 || null,
-          city,
-          state,
-          postal_code: postalCode,
-          phone
-        }
-      });
+      onChange({ newVet });
     }
   }, [
     useExistingVet,
     selectedVetId,
-    vetName,
-    clinicName,
-    street1,
-    street2,
-    city,
-    state,
-    postalCode,
-    phone,
+    newVet,
     onChange
   ]);
 
+  if (!userId) {
+    return (
+      <Typography sx={{ textAlign: "left", mt: "4rem", color: "#980061", paddingBottom: "1rem", fontSize: "1.25rem" }}>
+        Loading account...
+      </Typography>
+    );
+  }
+
+  if (loadingVets) {
+    return (
+      <Typography sx={{ textAlign: "left", mt: "4rem", color: "#980061", paddingBottom: "1rem", fontSize: "1.25rem" }}>
+        Loading veterinarian info ...
+      </Typography>
+    );
+  }
+
   return (
     <Box sx={{ marginTop: "1rem" }}>
-      <Typography variant="h6" sx={{ color: "#980061", marginBottom: "1rem" }}>
+      <Typography sx={{fontSize: "1.75rem"}}>
         Veterinarian
       </Typography>
 
@@ -84,17 +60,21 @@ export default function VetSelector({ user, onChange }) {
         <Box sx={{ marginBottom: "1rem" }}>
           <Box sx={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
             <Button
-              variant={useExistingVet ? "contained" : "outlined"}
-              onClick={() => setUseExistingVet(true)}
-              sx={plumButton(useExistingVet)}
+              variant={useExistingVet ? "plum-contained" : "plum-outlined"}
+              onClick={() => {
+                setUseExistingVet(true);
+                reset();
+              }}
             >
               Use Existing Vet
             </Button>
 
             <Button
-              variant={!useExistingVet ? "contained" : "outlined"}
-              onClick={() => setUseExistingVet(false)}
-              sx={plumButton(!useExistingVet)}
+              variant={!useExistingVet ? "plum-contained" : "plum-outlined"}
+              onClick={() => {
+                setUseExistingVet(false);
+                setSelectedVetId("");
+              }}
             >
               Add New Vet
             </Button>
@@ -102,18 +82,17 @@ export default function VetSelector({ user, onChange }) {
 
           {useExistingVet && (
             <TextField
-              select
-              fullWidth
               label="Select A Veterinarian"
               value={selectedVetId}
               onChange={(e) => setSelectedVetId(e.target.value)}
-              SelectProps={{ native: true }}
+              select
             >
-              <option value=""></option>
+              <MenuItem value=""></MenuItem>
+
               {existingVets.map((v) => (
-                <option key={v.id} value={v.id}>
+                <MenuItem key={v.id} value={v.id}>
                   {v.vet_name} — {v.clinic_name}
-                </option>
+                </MenuItem>
               ))}
             </TextField>
           )}
@@ -122,14 +101,14 @@ export default function VetSelector({ user, onChange }) {
 
       {!useExistingVet && (
         <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <TextField label="Vet Name" value={vetName} onChange={(e) => setVetName(e.target.value)} required />
-          <TextField label="Clinic Name" value={clinicName} onChange={(e) => setClinicName(e.target.value)} required />
-          <TextField label="Street Line 1" value={street1} onChange={(e) => setStreet1(e.target.value)} required />
-          <TextField label="Street Line 2" value={street2} onChange={(e) => setStreet2(e.target.value)} />
-          <TextField label="City" value={city} onChange={(e) => setCity(e.target.value)} required />
-          <TextField label="State" value={state} onChange={(e) => setState(e.target.value)} required />
-          <TextField label="Postal Code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} required />
-          <TextField label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+          <TextField label="Vet Name" value={fields.vetName} onChange={(e) => setters.setVetName(e.target.value)} />
+          <TextField label="Clinic Name" value={fields.clinicName} onChange={(e) => setters.setClinicName(e.target.value)} />
+          <TextField label="Street Line 1" value={fields.street1} onChange={(e) => setters.setStreet1(e.target.value)} />
+          <TextField label="Street Line 2" value={fields.street2} onChange={(e) => setters.setStreet2(e.target.value)} />
+          <TextField label="City" value={fields.city} onChange={(e) => setters.setCity(e.target.value)} />
+          <TextField label="State" value={fields.state} onChange={(e) => setters.setState(e.target.value)} />
+          <TextField label="Postal Code" value={fields.postalCode} onChange={(e) => setters.setPostalCode(e.target.value)} />
+          <TextField label="Phone" value={fields.phone} onChange={(e) => setters.setPhone(e.target.value)} />
         </Box>
       )}
     </Box>

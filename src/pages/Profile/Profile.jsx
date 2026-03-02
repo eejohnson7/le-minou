@@ -7,26 +7,22 @@ import { useUserPets } from "../../hooks/useUserPets";
 import { useLogout } from "../../hooks/auth/useLogout";
 import ProfileSidebar from "../../components/Profile/ProfileSidebar";
 import PetCard from "../../components/Profile/PetCard";
-import { plumButton } from "../../styles/buttonStyles";
 
 export default function Profile() {
   const navigate = useNavigate();
 
-  // FIXED: correct destructuring
   const { user: authUser, loading: loadingUser } = useAuthUser();
 
   const { profile, loading: loadingProfile } = useProfile(authUser?.id);
   const { pets, loading: loadingPets } = useUserPets(authUser?.id);
   const logout = useLogout();
 
-  // SAFE redirect: only fires when loading is done AND no user exists
   useEffect(() => {
     if (!loadingUser && !authUser) {
       navigate("/sign-in");
     }
   }, [loadingUser, authUser, navigate]);
 
-  // Loading states
   if (loadingUser || loadingProfile) {
     return (
       <Typography sx={{ textAlign: "center", mt: "4rem", color: "#980061" }}>
@@ -35,7 +31,6 @@ export default function Profile() {
     );
   }
 
-  // If redirect is happening
   if (!authUser) return null;
 
   return (
@@ -61,7 +56,7 @@ export default function Profile() {
       <Box sx={{ flexGrow: 1 }}>
         <Typography
           variant="h2"
-          sx={{ fontSize: "2.5rem", marginBottom: "2rem", fontWeight: 500 }}
+          sx={{ fontSize: "2.5rem", marginBottom: "2rem" }}
         >
           Your Profile
         </Typography>
@@ -99,8 +94,7 @@ export default function Profile() {
           )}
 
           <Button
-            variant="contained"
-            sx={plumButton(true)}
+            variant="plum-contained"
             onClick={() => navigate("/add-pet")}
           >
             Add Pet
@@ -119,8 +113,7 @@ export default function Profile() {
         </Typography>
 
         <Button
-          variant="contained"
-          sx={plumButton(true)}
+          variant="plum-contained"
           onClick={() => navigate("/book-service")}
         >
           Add New Booking

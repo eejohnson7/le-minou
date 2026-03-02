@@ -15,3 +15,31 @@ body {
   min-height: 100vh;
   font-family: var(--font-serif);
 }
+
+/* Label color */
+.MuiInputLabel-root {
+  color: #980061 !important;
+}
+
+/* Input text color */
+.MuiInputBase-input {
+  color: #980061 !important;
+}
+
+/* Outlined border (default, hover, focus) */
+.MuiOutlinedInput-notchedOutline {
+  border-color: #980061 !important;
+}
+
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #980061 !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #980061 !important;
+}
+
+/* Select text color */
+.MuiSelect-select {
+  color: #980061 !important;
+}

@@ -1,19 +1,31 @@
 import { useCreatePet } from "../../hooks/useCreatePet";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, TextField } from "@mui/material";
 import VetSelector from "../../components/AddPet/VetSelector";
 import PetPhotoUpload from "../../components/AddPet/PetPhotoUpload";
-import PetFields from "../../components/AddPet/PetFields";
 import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useState } from "react";
-import { plumButton } from "../../styles/buttonStyles";
+import SpeciesSelector from "../../components/SpeciesSelector";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPet() {
-  const user = useAuthUser();
-  const [petFields, setPetFields] = useState({ name: "", birthdate: "", species: "", breed: "" });
+  const { user, loading: loadingUser } = useAuthUser();
+  const navigate = useNavigate();
+
+  const [petFields, setPetFields] = useState({
+    name: "",
+    birthdate: "",
+    species: "",
+    breed: ""
+  });
+
   const [photoFile, setPhotoFile] = useState(null);
   const [vetData, setVetData] = useState(null);
 
   const { createPet, loading, error, success } = useCreatePet();
+
+  const updateField = (field, value) => {
+    setPetFields((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async () => {
     await createPet({
@@ -22,21 +34,56 @@ export default function AddPet() {
       vetData,
       photoFile
     });
+    
+    navigate("/profile");
   };
 
-  return (
-    <Box>
-      <Typography>Add a Pet</Typography>
+  if (loadingUser || !user) {
+    return (
+      <Typography sx={{ mt: "4rem", color: "#980061" }}>
+        Loading account…
+      </Typography>
+    );
+  }
 
-      <PetFields fields={petFields} onChange={setPetFields} />
+  return (
+    <Box sx={{ maxWidth: "900px", margin: "4rem auto", padding: "0 2rem", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      <Typography sx={{ fontSize: "2.5rem" }}>
+        Add a Pet
+      </Typography>
+
+      <TextField
+        label="Name"
+        value={petFields.name}
+        onChange={(e) => updateField("name", e.target.value)}
+      />
+
+      <TextField
+        label="Birthdate"
+        value={petFields.birthdate}
+        onChange={(e) => updateField("birthdate", e.target.value)}
+      />
+
+      <SpeciesSelector
+        label="Species"
+        value={petFields.species}
+        onChange={(v) => updateField("species", v)}
+      />
+
+      <TextField
+        label="Breed"
+        value={petFields.breed}
+        onChange={(e) => updateField("breed", e.target.value)}
+      />
 
       <PetPhotoUpload photoFile={photoFile} onChange={setPhotoFile} />
 
       <VetSelector user={user} onChange={setVetData} />
 
-      <Button sx={plumButton(true)} onClick={handleSubmit}>Save Pet</Button>
+      <Button variant="plum-contained" onClick={handleSubmit} disabled={loading}>
+        Save Pet
+      </Button>
 
-      {success && <Typography>Pet added successfully.</Typography>}
       {error && <Typography>{error}</Typography>}
     </Box>
   );

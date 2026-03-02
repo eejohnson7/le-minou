@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
-import { plumButton } from "../../styles/buttonStyles";
 
 export default function PetPhotoUpload({ photoFile, onChange }) {
   const [preview, setPreview] = useState(null);
@@ -23,9 +22,8 @@ export default function PetPhotoUpload({ photoFile, onChange }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <Button
-        variant="outlined"
+        variant="plum-contained"
         component="label"
-        sx={plumButton(true)}
       >
         Upload Pet Photo
         <input type="file" accept="image/*" hidden onChange={handleFileChange} />
@@ -44,7 +42,7 @@ export default function PetPhotoUpload({ photoFile, onChange }) {
               objectFit: "cover"
             }}
           />
-          <Typography sx={{ color: "#980061" }}>{photoFile?.name}</Typography>
+          <Typography>{photoFile?.name}</Typography>
         </Box>
       )}
     </Box>

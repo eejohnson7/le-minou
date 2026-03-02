@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Typography, TextField, Button } from "@mui/material";
+import { Typography, Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AuthCard from "../../components/AuthCard";
 import { useResetPassword } from "../../hooks/auth/useResetPassword";
-import { plumButton } from "../../styles/buttonStyles";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ export default function ResetPassword() {
   if (loading) {
     return (
       <AuthCard>
-        <Typography sx={{ color: "#980061" }}>
+        <Typography>
           Verifying your reset link…
         </Typography>
       </AuthCard>
@@ -30,23 +29,21 @@ export default function ResetPassword() {
 
   return (
     <AuthCard>
-      <Typography sx={{ fontSize: "2rem", mb: 2, color: "#980061" }}>
+      <Typography sx={{ fontSize: "2rem" }}>
         Reset Password
       </Typography>
 
       <TextField
         label="New Password"
         type="password"
-        fullWidth
         sx={{ mb: 2 }}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
       <Button
-        variant="contained"
+        variant="plum-contained"
         fullWidth
-        sx={plumButton(true)}
         onClick={() => updatePassword(password)}
       >
         Update Password
@@ -59,9 +56,6 @@ export default function ResetPassword() {
       <Typography
         onClick={() => navigate("/forgot-password")}
         sx={{
-          mt: "1rem",
-          textAlign: "center",
-          color: "#980061",
           cursor: "pointer"
         }}
       >

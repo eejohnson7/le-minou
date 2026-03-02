@@ -2,35 +2,24 @@ import { useState } from "react";
 import { Typography, TextField, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import AuthCard from "../../components/AuthCard";
-import { useSignUp } from "../../hooks/auth/useSignUp";
-import { plumButton } from "../../styles/buttonStyles";
+import { useSignIn } from "../../hooks/auth/useSignIn";
 
-export default function SignUp() {
+export default function SignIn() {
   const navigate = useNavigate();
-  const { signUp, loading, errorMsg } = useSignUp();
+  const { signIn, loading, errorMsg } = useSignIn();
 
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   return (
     <AuthCard>
-      <Typography sx={{ fontSize: "2.5rem", color: "#980061", mb: "1.5rem" }}>
-        Create Account
+      <Typography sx={{ fontSize: "2rem" }}>
+        Sign In
       </Typography>
-
-      <TextField
-        label="Name"
-        fullWidth
-        sx={{ mb: "1rem" }}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
 
       <TextField
         label="Email"
         type="email"
-        fullWidth
         sx={{ mb: "1rem" }}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -39,36 +28,46 @@ export default function SignUp() {
       <TextField
         label="Password"
         type="password"
-        fullWidth
         sx={{ mb: "1.5rem" }}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
       <Button
-        variant="contained"
+        variant="plum-contained"
         fullWidth
         disabled={loading}
-        sx={plumButton(true)}
-        onClick={() => signUp(name, email, password)}
+        onClick={() => signIn(email, password)}
       >
-        Create Account
+        Sign In
       </Button>
 
       {errorMsg && (
-        <Typography sx={{ color: "red", mt: "1rem" }}>{errorMsg}</Typography>
+        <Typography sx={{ color: "red", mt: "1rem" }}>
+          {errorMsg}
+        </Typography>
       )}
 
       <Typography
-        onClick={() => navigate("/sign-in")}
+        onClick={() => navigate("/forgot-password")}
         sx={{
           mt: "1rem",
           textAlign: "center",
-          color: "#980061",
           cursor: "pointer"
         }}
       >
-        Already have an account? Sign in
+        Forgot your password?
+      </Typography>
+
+      <Typography
+        onClick={() => navigate("/create-account")}
+        sx={{
+          mt: "0.5rem",
+          textAlign: "center",
+          cursor: "pointer"
+        }}
+      >
+        Create an account
       </Typography>
     </AuthCard>
   );
