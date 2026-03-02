@@ -1,0 +1,17 @@
+@font-face {
+  font-family: "casual_sunday";
+  src: url("../assets/fonts/casual_sunday.otf") format("woff2");
+}
+
+:root {
+  --font-serif: "casual_sunday", serif;
+}
+
+
+body {
+  background-color: #FFECF2;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: var(--font-serif);
+}
