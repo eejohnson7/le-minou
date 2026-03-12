@@ -34,7 +34,7 @@ export default function Services() {
       <Box sx={{ textAlign: "center", marginTop: "3rem" }}>
         {isSignedIn ? (
           <Button
-            onClick={() => navigate("/book-service")}
+            onClick={() => navigate("/book/pet-selection")}
             variant="plum-contained"
           >
             Book a Service
