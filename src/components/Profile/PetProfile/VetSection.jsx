@@ -1,8 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import HoverEditableField from "../HoverEditableField";
 
-export default function VetSection({ pet, updateVet }) {
+export default function VetSection({ pet, saveVet, updatePetVetId, updateLocalVet }) {
   const vet = pet?.vet ?? {};
+  const vetId = pet?.vet_id ?? null;
 
   const placeholder = (text) => (
     <Typography sx={{ fontSize: "1.25rem", opacity: 0.4 }}>
@@ -15,6 +16,19 @@ export default function VetSection({ pet, updateVet }) {
       {text}
     </Typography>
   );
+
+  // 🌸 Unified update handler — prevents duplicates + updates UI instantly
+  async function handleVetFieldUpdate(field, value) {
+    const result = await saveVet(vetId, { [field]: value });
+
+    // If a new vet was created, attach it to the pet
+    if (result.created) {
+      updatePetVetId(result.vetId);
+    }
+
+    // Update UI immediately
+    updateLocalVet(field, value);
+  }
 
   return (
     <Box
@@ -41,7 +55,7 @@ export default function VetSection({ pet, updateVet }) {
       <HoverEditableField
         value={vet.vet_name}
         placeholder="Vet name"
-        onSave={(val) => updateVet("vet_name", val)}
+        onSave={(val) => handleVetFieldUpdate("vet_name", val)}
         renderDisplay={(val) => (val ? display(val) : placeholder("Vet name"))}
       />
 
@@ -49,7 +63,7 @@ export default function VetSection({ pet, updateVet }) {
       <HoverEditableField
         value={vet.clinic_name}
         placeholder="Clinic name"
-        onSave={(val) => updateVet("clinic_name", val)}
+        onSave={(val) => handleVetFieldUpdate("clinic_name", val)}
         renderDisplay={(val) =>
           val ? display(val) : placeholder("Clinic name")
         }
@@ -59,16 +73,15 @@ export default function VetSection({ pet, updateVet }) {
       <HoverEditableField
         value={vet.phone}
         placeholder="Phone"
-        onSave={(val) => updateVet("phone", val)}
+        onSave={(val) => handleVetFieldUpdate("phone", val)}
         renderDisplay={(val) => (val ? display(val) : placeholder("Phone"))}
       />
 
-      {/* ADDRESS — matches ProfileSidebar */}
       {/* Street Line 1 */}
       <HoverEditableField
         value={vet.street_line_1}
         placeholder="Street address"
-        onSave={(val) => updateVet("street_line_1", val)}
+        onSave={(val) => handleVetFieldUpdate("street_line_1", val)}
         renderDisplay={(val) =>
           val ? display(val) : placeholder("Street address")
         }
@@ -78,31 +91,31 @@ export default function VetSection({ pet, updateVet }) {
       <HoverEditableField
         value={vet.street_line_2}
         placeholder="Apt, suite, etc."
-        onSave={(val) => updateVet("street_line_2", val)}
+        onSave={(val) => handleVetFieldUpdate("street_line_2", val)}
         renderDisplay={(val) =>
           val ? display(val) : placeholder("Apt, suite, etc.")
         }
       />
 
-      {/* City, State ZIP — multi-field like ProfileSidebar */}
+      {/* City, State ZIP */}
       <HoverEditableField
         fields={[
           {
             label: "City",
             value: vet.city,
-            onSave: (v) => updateVet("city", v),
+            onSave: (v) => handleVetFieldUpdate("city", v),
             width: "120px",
           },
           {
             label: "State",
             value: vet.state,
-            onSave: (v) => updateVet("state", v),
+            onSave: (v) => handleVetFieldUpdate("state", v),
             width: "80px",
           },
           {
             label: "ZIP",
             value: vet.postal_code,
-            onSave: (v) => updateVet("postal_code", v),
+            onSave: (v) => handleVetFieldUpdate("postal_code", v),
             width: "90px",
           },
         ]}

@@ -22,27 +22,38 @@ export default function PetProfile() {
 
   const { pet, loading } = usePet(petId);
   const { updatePet } = useUpdatePet();
-  const { createVet, updateVet } = useUpdateVet(); // ← FIXED
-  const { uploadPetPhoto, uploading } = usePetPhoto();
+  const { saveVet } = useUpdateVet();   // ← IMPORTANT
+  const { uploadPetPhoto } = usePetPhoto();
 
   const [localPet, setLocalPet] = useState(null);
+
+  function updateLocalVet(field, value) {
+    setLocalPet(prev => ({
+      ...prev,
+      vet: {
+        ...prev.vet,
+        [field]: value
+      }
+    }));
+  }
 
   useEffect(() => {
     if (pet) setLocalPet(pet);
   }, [pet]);
 
+  // 🌸 Photo upload
   async function handlePhotoChange(file) {
-  if (!file) return;
+    if (!file) return;
 
-  const newUrl = await uploadPetPhoto(petId, file);
+    const newUrl = await uploadPetPhoto(petId, file);
 
-  if (newUrl) {
-    setLocalPet(prev => ({
-      ...prev,
-      photo_url: newUrl
-    }));
+    if (newUrl) {
+      setLocalPet(prev => ({
+        ...prev,
+        photo_url: newUrl
+      }));
+    }
   }
-}
 
   if (loading || !localPet) {
     return (
@@ -58,46 +69,10 @@ export default function PetProfile() {
     updatePet(petId, { [field]: value });
   }
 
-  async function updateVetField(field, value) {
-    const oldValue = localPet?.vet?.[field];
-
-    // 🌸 If the value didn't change, do nothing
-    if (oldValue === value) {
-      return;
-    }
-
-    // 🌸 CASE 1: Name changed → create a new vet
-    if (field === "vet_name") {
-      const newVet = await createVet({
-        user_id: localPet.user_id,
-        [field]: value
-      });
-
-      if (!newVet) return;
-
-      await updatePet(petId, { vet_id: newVet.id });
-
-      setLocalPet(prev => ({
-        ...prev,
-        vet_id: newVet.id,
-        vet: newVet
-      }));
-
-      return;
-    }
-
-    // 🌸 CASE 2: Other fields → update existing vet
-    if (localPet.vet_id) {
-      await updateVet(localPet.vet_id, { [field]: value });
-
-      setLocalPet(prev => ({
-        ...prev,
-        vet: {
-          ...prev.vet,
-          [field]: value
-        }
-      }));
-    }
+  // 🌸 Update pet.vet_id when a new vet is created
+  function updatePetVetId(newVetId) {
+    setLocalPet(prev => ({ ...prev, vet_id: newVetId }));
+    updatePet(petId, { vet_id: newVetId });
   }
 
   return (
@@ -110,7 +85,7 @@ export default function PetProfile() {
         }}
       >
         <PhotoUploader
-          src={pet.photo_url}
+          src={localPet.photo_url}
           onChange={handlePhotoChange}
           shape="rounded"
           size={180}
@@ -120,12 +95,17 @@ export default function PetProfile() {
           <IdentitySection pet={localPet} updatePetField={updatePetField} />
         </Box>
 
-        <VetInfoCard pet={localPet} updateVet={updateVetField} />
+        {/* 🌸 Vet card now uses saveVet + updatePetVetId */}
+        <VetInfoCard
+          pet={localPet}
+          saveVet={saveVet}
+          updatePetVetId={updatePetVetId}
+          updateLocalVet={updateLocalVet}
+        />
       </Box>
 
       <Divider sx={{ borderColor: "#980061", margin: "2rem 0" }} />
 
-      {/* other sections also use localPet */}
       <Typography sx={{ fontSize: "3rem" }}>Behavior & Personality</Typography>
       <BehaviorSection pet={localPet} updatePetField={updatePetField} />
 
