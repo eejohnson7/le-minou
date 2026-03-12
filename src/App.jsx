@@ -13,7 +13,6 @@ import AddPet from "./pages/Profile/AddPet";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PhotoLibrary from "./pages/PhotoLibrary";
 import PetProfile from "./pages/Profile/PetProfile";
-import EditPetProfile from "./pages/Profile/EditPetProfile";
 import "./styles/globals.css";
 
 export default function App() {
@@ -67,15 +66,6 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PetProfile />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/pet/:petId/edit"
-            element={
-              <ProtectedRoute>
-                <EditPetProfile />
               </ProtectedRoute>
             }
           />

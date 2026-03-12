@@ -25,7 +25,7 @@ export default function Profile() {
 
   if (loadingUser || loadingProfile) {
     return (
-      <Typography sx={{ textAlign: "center", mt: "4rem", color: "#980061" }}>
+      <Typography sx={{ textAlign: "center", mt: "4rem" }}>
         Loading your profile…
       </Typography>
     );
@@ -55,7 +55,6 @@ export default function Profile() {
       {/* Right Column */}
       <Box sx={{ flexGrow: 1 }}>
         <Typography
-          variant="h2"
           sx={{ fontSize: "2.5rem", marginBottom: "2rem" }}
         >
           Your Profile
@@ -65,7 +64,7 @@ export default function Profile() {
 
         {/* Pets Section */}
         <Box sx={{ marginBottom: "2rem" }}>
-          <Typography sx={{ fontSize: "1.75rem", marginBottom: "1rem" }}>
+          <Typography sx={{ fontSize: "2rem", marginBottom: "1rem" }}>
             Your Pets
           </Typography>
 
@@ -104,7 +103,7 @@ export default function Profile() {
         <Divider sx={{ borderColor: "#980061", marginBottom: "2rem" }} />
 
         {/* Bookings Section */}
-        <Typography sx={{ fontSize: "1.75rem", marginBottom: "1rem" }}>
+        <Typography sx={{ fontSize: "2rem", marginBottom: "1rem" }}>
           Upcoming Bookings
         </Typography>
 

@@ -16,18 +16,18 @@ export default function PetCard({ pet }) {
     >
       <Card
         sx={{
-          border: "1px solid #980061",
-          borderRadius: "12px",
-          backgroundColor: "rgba(152, 0, 97, 0.03)",
-          padding: "1rem",
+          borderRadius: "16px",
+          backgroundColor: "#FFDBE9",
+          padding: "1.5rem",
           cursor: "pointer",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
-          transition: "0.2s",
+          transition: "0.25s ease",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
           "&:hover": {
-            boxShadow: "0 0 0 2px #980061 inset",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
             transform: "translateY(-2px)"
           }
         }}
@@ -37,25 +37,25 @@ export default function PetCard({ pet }) {
             src={pet.photo_url || logo}
             alt={pet.name}
             style={{
-              width: "55px",
-              height: "55px",
+              width: "65px",
+              height: "65px",
               borderRadius: "50%",
               objectFit: "cover",
               border: "2px solid #980061",
-              marginBottom: "0.5rem"
+              marginBottom: "0.75rem"
             }}
           />
 
-          <Typography sx={{ fontSize: "1.75rem", color: "#980061" }}>
+          <Typography sx={{ fontSize: "1.6rem", color: "#980061", fontWeight: 600 }}>
             {pet.name}
           </Typography>
 
-          <Typography sx={{ opacity: 0.8, marginTop: "0.5rem", fontSize: "1.25rem" }}>
+          <Typography sx={{ opacity: 0.8, marginTop: "0.4rem", fontSize: "1.15rem" }}>
             {pet.species} {pet.breed && `- ${pet.breed}`}
           </Typography>
 
           {age && (
-            <Typography sx={{ opacity: 0.8, marginTop: "0.25rem", fontSize: "1.25rem" }}>
+            <Typography sx={{ opacity: 0.8, marginTop: "0.25rem", fontSize: "1.15rem" }}>
               Age: {age}
             </Typography>
           )}

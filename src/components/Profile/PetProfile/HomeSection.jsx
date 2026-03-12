@@ -1,22 +1,41 @@
 import { Box, Typography } from "@mui/material";
-import { isSectionEmpty } from "../../../utils/isSectionEmpty";
+import HoverEditableField from "../HoverEditableField";
 
-export default function HomeSection({ pet }) {
-  const empty = isSectionEmpty(pet, ["home_notes"]);
-
-  if (empty) {
-    return (
-      <Typography sx={{ opacity: 0.6, marginBottom: "2rem" }}>
-        Add home environment details to help sitters navigate {pet.name}’s space.
-      </Typography>
-    );
-  }
-
+export default function HomeSection({ pet, updatePetField }) {
   return (
-    <Box sx={{ marginBottom: "2rem" }}>
-      <Typography sx={{ fontSize: "1.25rem", opacity: 0.8, whiteSpace: "pre-wrap" }}>
-        {pet.home_notes}
-      </Typography>
+    <Box
+      sx={{
+        marginBottom: "2rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.75rem"
+      }}
+    >
+      <Box>
+        <HoverEditableField
+          textAlign="left"
+          value={pet.home_notes || ""}
+          onSave={(newValue) => updatePetField("home_notes", newValue)}
+          placeholder={`Add home environment details to help sitters navigate ${pet.name}’s space.`}
+          multiline
+          minRows={4}
+          renderDisplay={(value) => (
+            <Typography
+              sx={{
+                fontSize: "1.75rem",
+                lineHeight: 1.45,
+                opacity: value ? 0.85 : 0.55,
+                textAlign: "left",
+                whiteSpace: "pre-wrap",
+                paddingRight: "1.5rem" // important for pencil spacing
+              }}
+            >
+              {value ||
+                `Add home environment details to help sitters navigate ${pet.name}’s space.`}
+            </Typography>
+          )}
+        />
+      </Box>
     </Box>
   );
 }

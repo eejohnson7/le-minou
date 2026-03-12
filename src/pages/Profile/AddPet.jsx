@@ -6,6 +6,7 @@ import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useState } from "react";
 import SpeciesSelector from "../../components/SpeciesSelector";
 import { useNavigate } from "react-router-dom";
+import PetDateField from "../../components/Profile/PetDateField";
 
 export default function AddPet() {
   const { user, loading: loadingUser } = useAuthUser();
@@ -58,11 +59,11 @@ export default function AddPet() {
         onChange={(e) => updateField("name", e.target.value)}
       />
 
-      <TextField
+      <PetDateField
         label="Birthdate"
         value={petFields.birthdate}
-        onChange={(e) => updateField("birthdate", e.target.value)}
-      />
+        onChange={(val) => updateField("birthdate", val)}
+/>
 
       <SpeciesSelector
         label="Species"

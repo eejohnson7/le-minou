@@ -1,22 +1,40 @@
 import { Box, Typography } from "@mui/material";
-import { isSectionEmpty } from "../../../utils/isSectionEmpty";
+import HoverEditableField from "../HoverEditableField";
 
-export default function NotesSection({ pet }) {
-  const empty = isSectionEmpty(pet, ["notes"]);
-
-  if (empty) {
-    return (
-      <Typography sx={{ opacity: 0.6, marginBottom: "2rem" }}>
-        Add general notes about {pet.name} to complete their profile.
-      </Typography>
-    );
-  }
-
+export default function NotesSection({ pet, updatePetField }) {
   return (
-    <Box sx={{ marginBottom: "2rem" }}>
-      <Typography sx={{ fontSize: "1.25rem", opacity: 0.8, whiteSpace: "pre-wrap" }}>
-        {pet.notes}
-      </Typography>
+    <Box
+      sx={{
+        marginBottom: "2rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.75rem"
+      }}
+    >
+      <Box>
+        <HoverEditableField
+          textAlign="left"
+          value={pet.notes || ""}
+          onSave={(val) => updatePetField("notes", val)}
+          placeholder={`Add general notes about ${pet.name}`}
+          multiline
+          minRows={3}
+          renderDisplay={(val) => (
+            <Typography
+              sx={{
+                fontSize: "1.75rem",
+                lineHeight: 1.45,
+                opacity: val ? 0.85 : 0.55,
+                textAlign: "left",
+                whiteSpace: "pre-wrap",
+                paddingRight: "1.5rem" // space for pencil
+              }}
+            >
+              {val || `Add general notes about ${pet.name}`}
+            </Typography>
+          )}
+        />
+      </Box>
     </Box>
   );
 }

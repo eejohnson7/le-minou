@@ -1,45 +1,132 @@
 import { Box, Typography } from "@mui/material";
-import { isSectionEmpty } from "../../../utils/isSectionEmpty";
+import HoverEditableField from "../HoverEditableField";
 
-export default function BathroomSection({ pet }) {
+export default function BathroomSection({ pet, updatePetField }) {
   const isCat = pet.species?.toLowerCase() === "cat";
   const isDog = pet.species?.toLowerCase() === "dog";
 
-  const keys = isCat
-    ? ["litter_type", "bathroom_notes"]
-    : isDog
-    ? ["walk_schedule", "bathroom_notes"]
-    : ["bathroom_notes"];
-
-  const empty = isSectionEmpty(pet, keys);
-
-  if (empty) {
-    return (
-      <Typography sx={{ opacity: 0.6, fontSize: "1.25rem" }}>
-        Add bathroom routine details to help sitters care for {pet.name}.
-      </Typography>
-    );
-  }
-
   return (
-    <Box sx={{ marginBottom: "2rem" }}>
-      {isCat && pet.litter_type && (
-        <Typography sx={{ fontSize: "1.25rem", opacity: 0.8 }}>
-          Litter: {pet.litter_type}
-        </Typography>
+    <Box
+      sx={{
+        marginBottom: "2rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.75rem"
+      }}
+    >
+
+      {/* Cat: Litter Type */}
+      {isCat && (
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "2.25rem",
+              opacity: 0.7,
+              textAlign: "left",
+              marginBottom: "0.35rem",
+              letterSpacing: "0.3px"
+            }}
+          >
+            Litter Type
+          </Typography>
+
+          <HoverEditableField
+            textAlign="left"
+            value={pet.litter_type || ""}
+            onSave={(val) => updatePetField("litter_type", val)}
+            placeholder="Add litter type"
+            renderDisplay={(val) => (
+              <Typography
+                sx={{
+                  fontSize: "1.5rem",
+                  lineHeight: 1.45,
+                  opacity: val ? 0.85 : 0.55,
+                  textAlign: "left",
+                  paddingRight: "1.5rem"
+                }}
+              >
+                {val || "Add litter type"}
+              </Typography>
+            )}
+          />
+        </Box>
       )}
 
-      {isDog && pet.walk_schedule && (
-        <Typography sx={{ fontSize: "1.25rem", opacity: 0.8 }}>
-          Walks: {pet.walk_schedule}
-        </Typography>
+      {/* Dog: Walk Schedule */}
+      {isDog && (
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "2.25rem",
+              opacity: 0.7,
+              textAlign: "left",
+              marginBottom: "0.35rem",
+              letterSpacing: "0.3px"
+            }}
+          >
+            Walk Schedule
+          </Typography>
+
+          <HoverEditableField
+            textAlign="left"
+            value={pet.walk_schedule || ""}
+            onSave={(val) => updatePetField("walk_schedule", val)}
+            placeholder="Add walk schedule"
+            renderDisplay={(val) => (
+              <Typography
+                sx={{
+                  fontSize: "1.5rem",
+                  lineHeight: 1.45,
+                  opacity: val ? 0.85 : 0.55,
+                  textAlign: "left",
+                  paddingRight: "1.5rem"
+                }}
+              >
+                {val || "Add walk schedule"}
+              </Typography>
+            )}
+          />
+        </Box>
       )}
 
-      {pet.bathroom_notes && (
-        <Typography sx={{ fontSize: "1.25rem", opacity: 0.8, whiteSpace: "pre-wrap" }}>
-          {pet.bathroom_notes}
+      {/* Bathroom Notes (all species) */}
+      <Box>
+        <Typography
+          sx={{
+            fontSize: "2.25rem",
+            opacity: 0.7,
+            textAlign: "left",
+            marginBottom: "0.35rem",
+            letterSpacing: "0.3px"
+          }}
+        >
+          Bathroom Notes
         </Typography>
-      )}
+
+        <HoverEditableField
+          textAlign="left"
+          value={pet.bathroom_notes || ""}
+          onSave={(val) => updatePetField("bathroom_notes", val)}
+          placeholder="Add bathroom notes"
+          multiline
+          minRows={2}
+          renderDisplay={(val) => (
+            <Typography
+              sx={{
+                fontSize: "1.5rem",
+                lineHeight: 1.45,
+                opacity: val ? 0.85 : 0.55,
+                textAlign: "left",
+                whiteSpace: "pre-wrap",
+                paddingRight: "1.5rem"
+              }}
+            >
+              {val || "Add bathroom notes"}
+            </Typography>
+          )}
+        />
+      </Box>
+
     </Box>
   );
 }

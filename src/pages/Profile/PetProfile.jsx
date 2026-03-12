@@ -1,7 +1,12 @@
-import { Box, Typography, Button, Divider } from "@mui/material";
-import { useParams, useNavigate } from "react-router-dom";
+import { Box, Typography, Divider } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import { usePet } from "../../hooks/usePet";
-import PetPhoto from "../../components/Profile/PetProfile/PetPhoto";
+import { useUpdatePet } from "../../hooks/useUpdatePet";
+import { useUpdateVet } from "../../hooks/useUpdateVet";
+import { usePetPhoto } from "../../hooks/usePetPhoto";
+
 import IdentitySection from "../../components/Profile/PetProfile/IdentitySection";
 import FeedingSection from "../../components/Profile/PetProfile/FeedingSection";
 import BathroomSection from "../../components/Profile/PetProfile/BathroomSection";
@@ -10,13 +15,36 @@ import BehaviorSection from "../../components/Profile/PetProfile/BehaviorSection
 import HomeSection from "../../components/Profile/PetProfile/HomeSection";
 import NotesSection from "../../components/Profile/PetProfile/NotesSection";
 import VetInfoCard from "../../components/Profile/PetProfile/VetSection";
+import PhotoUploader from "../../components/Profile/PhotoUploader";
 
 export default function PetProfile() {
   const { petId } = useParams();
-  const navigate = useNavigate();
-  const { pet, loading } = usePet(petId);
 
-  if (loading) {
+  const { pet, loading } = usePet(petId);
+  const { updatePet } = useUpdatePet();
+  const { createVet, updateVet } = useUpdateVet(); // ← FIXED
+  const { uploadPetPhoto, uploading } = usePetPhoto();
+
+  const [localPet, setLocalPet] = useState(null);
+
+  useEffect(() => {
+    if (pet) setLocalPet(pet);
+  }, [pet]);
+
+  async function handlePhotoChange(file) {
+  if (!file) return;
+
+  const newUrl = await uploadPetPhoto(petId, file);
+
+  if (newUrl) {
+    setLocalPet(prev => ({
+      ...prev,
+      photo_url: newUrl
+    }));
+  }
+}
+
+  if (loading || !localPet) {
     return (
       <Typography sx={{ textAlign: "center", mt: "4rem", color: "#980061" }}>
         Loading pet…
@@ -24,14 +52,52 @@ export default function PetProfile() {
     );
   }
 
-  if (!pet) {
-    return (
-      <Typography sx={{ textAlign: "center", mt: "4rem", color: "#980061" }}>
-        Pet not found.
-      </Typography>
-    );
-  } else {
-    console.log("Pet data:", pet);
+  // 🌸 Update PET fields
+  function updatePetField(field, value) {
+    setLocalPet(prev => ({ ...prev, [field]: value }));
+    updatePet(petId, { [field]: value });
+  }
+
+  async function updateVetField(field, value) {
+    const oldValue = localPet?.vet?.[field];
+
+    // 🌸 If the value didn't change, do nothing
+    if (oldValue === value) {
+      return;
+    }
+
+    // 🌸 CASE 1: Name changed → create a new vet
+    if (field === "vet_name") {
+      const newVet = await createVet({
+        user_id: localPet.user_id,
+        [field]: value
+      });
+
+      if (!newVet) return;
+
+      await updatePet(petId, { vet_id: newVet.id });
+
+      setLocalPet(prev => ({
+        ...prev,
+        vet_id: newVet.id,
+        vet: newVet
+      }));
+
+      return;
+    }
+
+    // 🌸 CASE 2: Other fields → update existing vet
+    if (localPet.vet_id) {
+      await updateVet(localPet.vet_id, { [field]: value });
+
+      setLocalPet(prev => ({
+        ...prev,
+        vet: {
+          ...prev.vet,
+          [field]: value
+        }
+      }));
+    }
   }
 
   return (
@@ -41,99 +107,42 @@ export default function PetProfile() {
           display: "flex",
           gap: "3rem",
           alignItems: "flex-start",
-          justifyContent: "center"
         }}
       >
-        {/* Left: Photo */}
-        <PetPhoto pet={pet} />
+        <PhotoUploader
+          src={pet.photo_url}
+          onChange={handlePhotoChange}
+          shape="rounded"
+          size={180}
+        />
 
-        {/* Middle: Identity */}
         <Box sx={{ minWidth: "250px" }}>
-          <IdentitySection pet={pet} />
+          <IdentitySection pet={localPet} updatePetField={updatePetField} />
         </Box>
 
-        {/* Right: Vet Info Card */}
-        <VetInfoCard pet={pet} />
+        <VetInfoCard pet={localPet} updateVet={updateVetField} />
       </Box>
 
       <Divider sx={{ borderColor: "#980061", margin: "2rem 0" }} />
 
-      <Typography
-        sx={{
-          fontSize: "2.5rem",
-          color: "#980061",
-        }}
-      >
-        Feeding & Water
-      </Typography>
-      <FeedingSection pet={pet} />
+      {/* other sections also use localPet */}
+      <Typography sx={{ fontSize: "3rem" }}>Behavior & Personality</Typography>
+      <BehaviorSection pet={localPet} updatePetField={updatePetField} />
 
-      <Typography
-        sx={{
-          fontSize: "2.5rem",
-          letterSpacing: "0.2px",
-          color: "#980061",
-          mb: 1.5,
-        }}
-      >
-        Bathroom Routine
-      </Typography>
-      <BathroomSection pet={pet} />
+      <Typography sx={{ fontSize: "3rem" }}>Feeding</Typography>
+      <FeedingSection pet={localPet} updatePetField={updatePetField} />
 
-      <Typography
-        sx={{
-          fontSize: "2.5rem",
-          letterSpacing: "0.2px",
-          color: "#980061",
-          mb: 1.5,
-        }}
-      >
-        Health & Medical
-      </Typography>
-      <HealthSection pet={pet} />
+      <Typography sx={{ fontSize: "3rem" }}>Bathroom Habits</Typography>
+      <BathroomSection pet={localPet} updatePetField={updatePetField} />
 
-      <Typography
-        sx={{
-          fontSize: "2.5rem",
-          letterSpacing: "0.2px",
-          color: "#980061",
-          mb: 1.5,
-        }}
-      >
-        Behavior & Personality
-      </Typography>
-      <BehaviorSection pet={pet} />
+      <Typography sx={{ fontSize: "3rem" }}>Health</Typography>
+      <HealthSection pet={localPet} updatePetField={updatePetField} />
 
-      <Typography
-        sx={{
-          fontSize: "2.5rem",
-          letterSpacing: "0.2px",
-          color: "#980061",
-          mb: 1.5,
-        }}
-      >
-        Home Environment
-      </Typography>
-        <HomeSection pet={pet} />
+      <Typography sx={{ fontSize: "3rem" }}>Home Environment</Typography>
+      <HomeSection pet={localPet} updatePetField={updatePetField} />
 
-        <Typography
-          sx={{
-            fontSize: "2.5rem",
-            letterSpacing: "0.2px",
-            color: "#980061",
-            mb: 1.5,
-          }}
-        >
-          Notes
-        </Typography>
-      <NotesSection pet={pet} />
-
-      <Button
-        variant="plum-contained"
-        onClick={() => navigate(`/pet/${petId}/edit`)}
-      >
-        Edit Pet Profile
-      </Button>
+      <Typography sx={{ fontSize: "3rem" }}>Notes</Typography>
+      <NotesSection pet={localPet} updatePetField={updatePetField} />
     </Box>
   );
 }
