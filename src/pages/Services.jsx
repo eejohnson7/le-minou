@@ -2,9 +2,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-import { useAuthUser } from "../../hooks/auth/useAuthUser";
-import ServiceList from "../../components/ServiceList";
-import { SERVICES } from "../../data/services";
+import { useAuthUser } from "../hooks/auth/useAuthUser";
+import ServiceList from "../components/ServiceList";
+import { SERVICES } from "../data/services";
 
 export default function Services() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function Services() {
       <Box sx={{ textAlign: "center", marginTop: "3rem" }}>
         {isSignedIn ? (
           <Button
-            onClick={() => navigate("/book/pet-selection")}
+            onClick={() => navigate("/book/pet")}
             variant="plum-contained"
           >
             Book a Service

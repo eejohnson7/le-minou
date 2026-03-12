@@ -5,7 +5,7 @@ import { useUserPets } from "../../hooks/useUserPets";
 import { useBooking } from "../../context/BookingContext";
 import ServiceOptionCard from "../../components/Service/ServiceOptionCard";
 
-export default function BookService() {
+export default function Service() {
   const navigate = useNavigate();
 
   const { user: authUser, loading: loadingUser } = useAuthUser();
@@ -13,8 +13,8 @@ export default function BookService() {
 
   const {
     pets: selectedPets,
-    serviceType,
-    setServiceType
+    service,
+    setService
   } = useBooking();
 
   if (loadingUser || loadingPets) {
@@ -35,7 +35,7 @@ export default function BookService() {
   );
 
   const handleSelectService = (service) => {
-    setServiceType((prev) => (prev === service ? null : service));
+    setService((prev) => (prev === service ? null : service));
   };
 
   return (
@@ -48,7 +48,7 @@ export default function BookService() {
       <ServiceOptionCard
         title="Drop-In Visit(s)"
         description="A gentle, attentive visit for feeding, litter, and companionship."
-        selected={serviceType === "drop-in"}
+        selected={service === "drop-in"}
         onSelect={() => handleSelectService("drop-in")}
       />
 
@@ -57,15 +57,15 @@ export default function BookService() {
         <ServiceOptionCard
           title="Dog Walk"
           description="A calm, structured walk tailored to your dog’s needs."
-          selected={serviceType === "dog-walk"}
+          selected={service === "dog-walk"}
           onSelect={() => handleSelectService("dog-walk")}
         />
       )}
 
       {/* Continue button */}
       <Button
-        variant={serviceType ? "plum-contained" : "plum-outlined"}
-        disabled={!serviceType}
+        variant={service ? "plum-contained" : "plum-outlined"}
+        disabled={!service}
         onClick={() => navigate("/book/duration")}
         sx={{ mt: 4, width: "100%", borderRadius: 2, py: 1.5, fontSize: "1.75rem" }}
       >

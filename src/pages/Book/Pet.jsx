@@ -6,7 +6,7 @@ import { useBooking } from "../../context/BookingContext";
 import PetSelectCard from "../../components/Service/PetSelectCard";
 import { Box, Button, Typography } from "@mui/material";
 
-export default function PetSelection() {
+export default function Pet() {
   const navigate = useNavigate();
 
   // Auth + profile

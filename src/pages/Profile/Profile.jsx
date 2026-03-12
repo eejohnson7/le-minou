@@ -113,7 +113,7 @@ export default function Profile() {
 
         <Button
           variant="plum-contained"
-          onClick={() => navigate("/book/pet-selection")}
+          onClick={() => navigate("/book/pet")}
         >
           Add New Booking
         </Button>
