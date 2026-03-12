@@ -7,9 +7,10 @@ export default function HoverEditableField({
   onSave,
   placeholder = "—",
   renderDisplay,
+  renderEditor,        // single-field custom editor
   type = "text",
-  fields,              // optional array for multi-field mode
-  textAlign = "center" // "left" or "center"
+  fields,               // multi-field mode
+  textAlign = "center"
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -23,7 +24,7 @@ export default function HoverEditableField({
 
   const containerRef = useRef(null);
 
-  // Keep drafts synced when not editing
+  // Sync drafts when not editing
   useEffect(() => {
     if (!editing) {
       setDraft(value ?? "");
@@ -87,43 +88,74 @@ export default function HoverEditableField({
     >
       {editing ? (
         fields ? (
-          // MULTI-FIELD MODE
-          <Box sx={{ display: "flex", gap: "0.5rem", width: "100%", justifyContent: "center" }}>
-            {fields.map((f, i) => (
-              <TextField
-                key={i}
-                label={f.label}
-                value={drafts[i]}
-                onChange={(e) => {
-                  const next = [...drafts];
-                  next[i] = e.target.value;
-                  setDrafts(next);
-                }}
-                onKeyDown={handleKeyDown}
-                autoFocus={i === 0}
-                sx={{
-                  width: f.width || "100px",
-                  "& .MuiInputBase-input": { textAlign }
-                }}
-              />
-            ))}
+          // 🌸 MULTI-FIELD MODE (supports per-field custom editors)
+          <Box
+            sx={{
+              display: "flex",
+              gap: "0.5rem",
+              width: "100%",
+              justifyContent: "center"
+            }}
+          >
+            {fields.map((f, i) => {
+              const value = drafts[i];
+              const setValue = (v) => {
+                const next = [...drafts];
+                next[i] = v;
+                setDrafts(next);
+              };
+
+              return (
+                <Box key={i} sx={{ width: f.width || "100px" }}>
+                  {f.renderEditor ? (
+                    f.renderEditor({
+                      value,
+                      setValue,
+                      commit,
+                      cancel
+                    })
+                  ) : (
+                    <TextField
+                      label={f.label}
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      autoFocus={i === 0}
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-input": { textAlign }
+                      }}
+                    />
+                  )}
+                </Box>
+              );
+            })}
           </Box>
         ) : (
-          // SINGLE-FIELD MODE
-          <TextField
-            fullWidth
-            type={type}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            autoFocus
-            sx={{
-              "& .MuiInputBase-input": { textAlign }
-            }}
-          />
+          // 🌸 SINGLE-FIELD MODE (supports custom editor)
+          renderEditor ? (
+            renderEditor({
+              value: draft,
+              setValue: setDraft,
+              commit,
+              cancel
+            })
+          ) : (
+            <TextField
+              fullWidth
+              type={type}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoFocus
+              sx={{
+                "& .MuiInputBase-input": { textAlign }
+              }}
+            />
+          )
         )
       ) : (
-        // DISPLAY MODE
+        // 🌸 DISPLAY MODE
         <Box
           sx={{
             width: "100%",
@@ -137,8 +169,8 @@ export default function HoverEditableField({
             sx={{
               display: "inline-block",
               position: "relative",
-              width: "auto",        // ← key fix
-              pr: "0.35rem"         // ← subtle breathing room
+              width: "auto",
+              pr: "0.35rem"
             }}
           >
             {renderDisplay ? (
@@ -163,7 +195,7 @@ export default function HoverEditableField({
                 sx={{
                   position: "absolute",
                   bottom: "-0.25rem",
-                  right: "-0.35rem",   // ← perfect inline pencil alignment
+                  right: "-0.35rem",
                   opacity: 0,
                   transition: "opacity 0.2s ease",
                   cursor: "pointer",

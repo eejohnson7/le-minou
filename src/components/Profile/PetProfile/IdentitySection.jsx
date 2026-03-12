@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { calculateAge } from "../../../utils/calculateAge";
 import HoverEditableField from "../HoverEditableField";
+import SpeciesSelector from "../../SpeciesSelector"; // adjust path as needed
 
 export default function IdentitySection({ pet, updatePetField }) {
   return (
@@ -33,22 +34,35 @@ export default function IdentitySection({ pet, updatePetField }) {
         }}
       />
 
-      {/* SPECIES */}
       <HoverEditableField
         fields={[
           {
             label: "Species",
             value: pet.species,
-            onSave: (v) => updatePetField("species", v),
             width: "120px",
+            onSave: (v) => updatePetField("species", v),
+
+            // 🌸 Custom editor for species
+            renderEditor: ({ value, setValue, commit }) => (
+              <SpeciesSelector
+                value={value}
+                onChange={(newVal) => {
+                  setValue(newVal);
+                  commit(); // auto-save on selection
+                }}
+                autoFocus
+              />
+            )
           },
           {
             label: "Breed",
             value: pet.breed,
-            onSave: (v) => updatePetField("breed", v),
             width: "160px",
-          },
+            onSave: (v) => updatePetField("breed", v)
+            // no custom editor → defaults to TextField
+          }
         ]}
+
         renderDisplay={([species, breed]) => {
           if (!species && !breed) {
             return (
