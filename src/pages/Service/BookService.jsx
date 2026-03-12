@@ -1,9 +1,76 @@
-import Typography from "@mui/material/Typography";
+import { Box, Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useAuthUser } from "../../hooks/auth/useAuthUser";
+import { useUserPets } from "../../hooks/useUserPets";
+import { useBooking } from "../../context/BookingContext";
+import ServiceOptionCard from "../../components/Service/ServiceOptionCard";
 
-function BookServicePage() {
+export default function BookService() {
+  const navigate = useNavigate();
+
+  const { user: authUser, loading: loadingUser } = useAuthUser();
+  const { pets: fetchedPets = [], loading: loadingPets } = useUserPets(authUser?.id);
+
+  const {
+    pets: selectedPets,
+    serviceType,
+    setServiceType
+  } = useBooking();
+
+  if (loadingUser || loadingPets) {
+    return (
+      <Typography sx={{ textAlign: "center", mt: "4rem" }}>
+        Loading your services…
+      </Typography>
+    );
+  }
+
+  if (!authUser) return null;
+
+  // 🐾 Only show Dog Walk if selected pets include a dog
+  const selectedDog = fetchedPets.some(
+    (pet) =>
+      selectedPets.includes(pet.id) &&
+      pet.species?.toLowerCase() === "dog"
+  );
+
+  const handleSelectService = (service) => {
+    setServiceType((prev) => (prev === service ? null : service));
+  };
+
   return (
-    <Typography>Booking page coming soon...</Typography>
+    <Box sx={{ maxWidth: 600, mx: "auto", px: 2, py: 4 }}>
+      <Typography sx={{ mb: 3, fontSize: "3rem" }}>
+        Choose your service
+      </Typography>
+
+      {/* Always available */}
+      <ServiceOptionCard
+        title="Drop-In Visit(s)"
+        description="A gentle, attentive visit for feeding, litter, and companionship."
+        selected={serviceType === "drop-in"}
+        onSelect={() => handleSelectService("drop-in")}
+      />
+
+      {/* Only show if selected pets include a dog */}
+      {selectedDog && (
+        <ServiceOptionCard
+          title="Dog Walk"
+          description="A calm, structured walk tailored to your dog’s needs."
+          selected={serviceType === "dog-walk"}
+          onSelect={() => handleSelectService("dog-walk")}
+        />
+      )}
+
+      {/* Continue button */}
+      <Button
+        variant={serviceType ? "plum-contained" : "plum-outlined"}
+        disabled={!serviceType}
+        onClick={() => navigate("/book/duration")}
+        sx={{ mt: 4, width: "100%", borderRadius: 2, py: 1.5, fontSize: "1.75rem" }}
+      >
+        Continue
+      </Button>
+    </Box>
   );
 }
-
-export default BookServicePage;
