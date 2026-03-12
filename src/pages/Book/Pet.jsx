@@ -3,7 +3,7 @@ import { useUserPets } from "../../hooks/useUserPets";
 import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useProfile } from "../../hooks/useProfile";
 import { useBooking } from "../../context/BookingContext";
-import PetSelectCard from "../../components/Service/PetSelectCard";
+import PetSelectCard from "../../components/Book/PetSelectCard";
 import { Box, Button, Typography } from "@mui/material";
 
 export default function Pet() {

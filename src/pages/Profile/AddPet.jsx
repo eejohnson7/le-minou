@@ -6,7 +6,7 @@ import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useState } from "react";
 import SpeciesSelector from "../../components/SpeciesSelector";
 import { useNavigate } from "react-router-dom";
-import PetDateField from "../../components/Profile/PetDateField";
+import PetDateField from "../../components/PetDateField";
 
 export default function AddPet() {
   const { user, loading: loadingUser } = useAuthUser();

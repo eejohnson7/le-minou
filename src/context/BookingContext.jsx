@@ -12,18 +12,18 @@ export function BookingProvider({ children }) {
   // ⭐ Duration (30 or 60)
   const [duration, setDuration] = useState(null);
 
-  // ⭐ Pricing + add-ons
-  const [basePrice, setBasePrice] = useState(null);
-  const [addons, setAddons] = useState([]);
-  const [catCount, setCatCount] = useState(1);
-
   // ⭐ Scheduling
-  const [date, setDate] = useState(null);
-  const [time, setTime] = useState(null);
-
-  // ⭐ Visit details
-  const [address, setAddress] = useState("");
-  const [notes, setNotes] = useState("");
+  const [dateMode, setDateMode] = useState(null);
+  const [dateRange, setDateRange] = useState({
+    start: null,
+    end: null
+  });
+  const [specificDates, setSpecificDates] = useState([]);
+  const [repeatSchedule, setRepeatSchedule] = useState({
+    days: [],        // ["mon", "wed"]
+    start: null,     // "2026-03-20"
+    end: null        // "2026-04-10"
+  });
 
   return (
     <BookingContext.Provider
@@ -37,26 +37,17 @@ export function BookingProvider({ children }) {
         duration,
         setDuration,
 
-        basePrice,
-        setBasePrice,
+        dateMode,
+        setDateMode,
 
-        addons,
-        setAddons,
+        dateRange,
+        setDateRange,
 
-        catCount,
-        setCatCount,
+        specificDates,
+        setSpecificDates,
 
-        date,
-        setDate,
-
-        time,
-        setTime,
-
-        address,
-        setAddress,
-
-        notes,
-        setNotes
+        repeatSchedule,
+        setRepeatSchedule
       }}
     >
       {children}

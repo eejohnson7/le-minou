@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useUserPets } from "../../hooks/useUserPets";
 import { useBooking } from "../../context/BookingContext";
-import ServiceOptionCard from "../../components/Service/ServiceOptionCard";
+import ServiceOptionCard from "../../components/Book/ServiceOptionCard";
 
 export default function Service() {
   const navigate = useNavigate();
