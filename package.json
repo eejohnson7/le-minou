@@ -13,6 +13,8 @@
     "@date-io/dayjs": "^3.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@fontsource/fraunces": "5.2.9",
+    "@fontsource/nunito-sans": "5.2.7",
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
     "@mui/x-date-pickers": "^8.27.2",

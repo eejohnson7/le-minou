@@ -13,18 +13,21 @@ import AddPet from "./pages/Profile/AddPet";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PhotoLibrary from "./pages/PhotoLibrary";
 import PetProfile from "./pages/Profile/PetProfile";
+import RequestCare from "./pages/RequestCare";
+import Footer from "./components/Footer";
 import "./styles/globals.css";
 
 export default function App() {
   return (
       <BrowserRouter>
         <NavBar />
-        <main style={{ padding: "2rem" }}>
+        <main>
           <Routes>
             {/* Public pages */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/request-care" element={<RequestCare />} />
             <Route path="/photo-library" element={<PhotoLibrary />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -64,6 +67,7 @@ export default function App() {
             />
           </Routes>
         </main>
+        <Footer />
       </BrowserRouter>
   );
 }
