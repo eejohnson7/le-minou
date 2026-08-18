@@ -43,9 +43,6 @@ export default function ServiceAreaFaqSection() {
         <Typography sx={{ color: "var(--muted-ink)", fontSize: "1rem", lineHeight: 1.75, mt: 2.5, maxWidth: 420 }}>
           The service area remains intentionally local. Specific neighborhood coverage will be confirmed when you request care.
         </Typography>
-        <Typography className="handwritten-accent" sx={{ color: "var(--plum)", fontSize: "1.08rem", mt: 2.5, transform: "rotate(-2deg)", transformOrigin: "left" }}>
-          familiar streets, familiar care
-        </Typography>
       </Box>
 
       <Box component="section" aria-labelledby="faq-title">
@@ -88,4 +85,3 @@ export default function ServiceAreaFaqSection() {
     </Section>
   );
 }
-

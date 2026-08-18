@@ -29,9 +29,6 @@ export default function Footer() {
             <Typography sx={{ color: "rgba(255, 253, 251, 0.7)", fontSize: "0.98rem", lineHeight: 1.7, mt: 2 }}>
               Owner-operated cat care, dog walking, and thoughtful in-home pet care on Chicago&apos;s North Side.
             </Typography>
-            <Typography className="handwritten-accent" sx={{ color: "var(--petal)", fontSize: "1.05rem", mt: 2, transform: "rotate(-2deg)", transformOrigin: "left" }}>
-              care, with the details remembered
-            </Typography>
           </Box>
 
           <Box component="nav" aria-label="Footer navigation" sx={{ display: "grid", alignContent: "start", gap: 1.25 }}>
@@ -66,4 +63,3 @@ export default function Footer() {
     </Box>
   );
 }
-

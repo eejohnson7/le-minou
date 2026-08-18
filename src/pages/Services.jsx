@@ -89,9 +89,6 @@ export default function Services() {
               Thoughtful options, clearly priced.
             </Typography>
           </Box>
-          <Typography className="handwritten-accent" aria-hidden="true" sx={{ display: { xs: "none", sm: "block" }, color: "var(--plum)", fontSize: "1.05rem", transform: "rotate(-3deg)", mb: 0.5 }}>
-            routines first
-          </Typography>
         </Box>
 
         <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, borderBottom: "1px solid var(--plum-line)" }}>
@@ -197,9 +194,7 @@ export default function Services() {
         </Box>
 
         <Box>
-          <Typography className="handwritten-accent" aria-hidden="true" sx={{ color: "var(--plum)", fontSize: "1.08rem", transform: "rotate(-2deg)", transformOrigin: "left", mb: 1.5 }}>
-            what stays consistent
-          </Typography>
+          <SectionEyebrow sx={{ mb: 1.5 }}>What stays consistent</SectionEyebrow>
           <Box component="ol" sx={{ listStyle: "none", m: 0, p: 0, borderBottom: "1px solid var(--plum-line)" }}>
             {carePrinciples.map((principle, index) => (
               <Box

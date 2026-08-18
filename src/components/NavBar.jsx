@@ -87,7 +87,7 @@ export default function NavBar() {
             to="/"
             aria-label="Le Minou home"
             onClick={closeMobileNav}
-            sx={{ display: "inline-flex", alignItems: "baseline", gap: 1, color: "var(--plum)", textDecoration: "none" }}
+            sx={{ display: "inline-flex", color: "var(--plum)", textDecoration: "none" }}
           >
             <Typography
               component="span"
@@ -99,14 +99,6 @@ export default function NavBar() {
               }}
             >
               Le Minou
-            </Typography>
-            <Typography
-              component="span"
-              className="handwritten-accent"
-              aria-hidden="true"
-              sx={{ display: { xs: "none", sm: "inline" }, fontSize: "0.9rem", transform: "rotate(-3deg)" }}
-            >
-              pet care
             </Typography>
           </Box>
 
