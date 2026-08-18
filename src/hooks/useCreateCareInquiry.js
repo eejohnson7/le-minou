@@ -18,8 +18,6 @@ export function useCreateCareInquiry() {
     setError("");
 
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 600));
-      throw new Error("Browser verification failure");
       const { error: insertError } = await supabase.from("care_inquiry").insert(record);
       if (insertError) throw insertError;
       return true;
