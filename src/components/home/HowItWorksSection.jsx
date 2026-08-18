@@ -52,12 +52,6 @@ export default function HowItWorksSection() {
         <Typography sx={{ color: "rgba(255, 253, 251, 0.72)", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.75, mt: 2.25, maxWidth: 430 }}>
           The process stays personal and straightforward from the first conversation through every visit.
         </Typography>
-        <Typography
-          className="handwritten-accent"
-          sx={{ color: "var(--petal)", fontSize: "1.08rem", mt: 3, transform: "rotate(-2deg)", transformOrigin: "left" }}
-        >
-          a small care ritual
-        </Typography>
       </Box>
       <Box
         component="ol"

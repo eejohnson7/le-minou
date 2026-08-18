@@ -45,12 +45,6 @@ export default function WhySection() {
           title="Small by design. Attentive on purpose."
           sx={{ mb: 2.5 }}
         />
-        <Typography
-          className="handwritten-accent"
-          sx={{ color: "var(--plum)", fontSize: "1.08rem", transform: "rotate(-2deg)", transformOrigin: "left" }}
-        >
-          care, kept close
-        </Typography>
       </Box>
       <Box
         component="ol"

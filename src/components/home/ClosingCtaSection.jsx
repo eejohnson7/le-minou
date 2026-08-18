@@ -59,9 +59,6 @@ export default function ClosingCtaSection() {
           pb: { md: 0.75 }
         }}
       >
-        <Typography className="handwritten-accent" sx={{ color: "var(--plum)", fontSize: "1.15rem", transform: "rotate(-3deg)" }}>
-          routines welcome
-        </Typography>
         <CtaLink to="/request-care" sx={{ minWidth: 170 }}>Request care</CtaLink>
       </Box>
     </Section>

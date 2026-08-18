@@ -88,7 +88,6 @@ export default function HeroSection() {
         <EditorialImageSlot
           cropLabel="Pet + home · 4:5 crop"
           footerLabel="Cats · Dogs · Home"
-          annotation="the details matter"
           sx={{
             width: { xs: "calc(100% - 1rem)", sm: "min(84%, 470px)", md: "100%" },
             maxWidth: 450,

@@ -16,9 +16,6 @@ export default function BrandStatement() {
     >
       <Box>
         <SectionEyebrow sx={{ mb: 2 }}>02 · The promise</SectionEyebrow>
-        <Typography className="handwritten-accent" sx={{ color: "var(--plum)", fontSize: "1.1rem", transform: "rotate(-2deg)", transformOrigin: "left" }}>
-          one familiar person
-        </Typography>
       </Box>
 
       <Box sx={{ borderLeft: { md: "1px solid var(--plum-line)" }, pl: { md: 6 } }}>
@@ -37,4 +34,3 @@ export default function BrandStatement() {
     </Section>
   );
 }
-

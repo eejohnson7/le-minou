@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 export default function EditorialImageSlot({
-  annotation,
   children,
   cropLabel,
   footerLabel,
@@ -88,24 +87,6 @@ export default function EditorialImageSlot({
         )}
       </Box>
 
-      {annotation && (
-        <Typography
-          component="figcaption"
-          className="handwritten-accent"
-          sx={{
-            position: "absolute",
-            right: { xs: -4, sm: -12 },
-            bottom: 0,
-            color: "var(--plum)",
-            fontSize: { xs: "1rem", sm: "1.12rem" },
-            lineHeight: 1.1,
-            transform: "rotate(-3deg)",
-            transformOrigin: "right"
-          }}
-        >
-          {annotation}
-        </Typography>
-      )}
     </Box>
   );
 }

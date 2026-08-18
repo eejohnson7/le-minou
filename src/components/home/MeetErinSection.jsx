@@ -23,7 +23,6 @@ export default function MeetErinSection() {
       <EditorialImageSlot
         cropLabel="Portrait · 4:5 crop"
         footerLabel="Owner + caregiver"
-        annotation="portrait, when ready"
         sx={{ width: "calc(100% - 1rem)", maxWidth: 460, mr: 1 }}
         mediaSx={{ aspectRatio: "4 / 5", bgcolor: "var(--paper)" }}
       >
