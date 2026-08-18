@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 import PageContainer from "../layout/PageContainer";
 import { SectionEyebrow } from "../layout/SectionHeading";
 
-const details = ["Owner-operated", "North Side Chicago", "One familiar caregiver"];
+const details = ["Owner-operated", "Chicago's North Side", "One familiar caregiver"];
 
 export default function AboutHero() {
   return (
