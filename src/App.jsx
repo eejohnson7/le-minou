@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import NavBar from "./components/NavBar";
 import SignIn from "./pages/Auth/SignIn";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
@@ -14,60 +13,54 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PhotoLibrary from "./pages/PhotoLibrary";
 import PetProfile from "./pages/Profile/PetProfile";
 import RequestCare from "./pages/RequestCare";
-import Footer from "./components/Footer";
+import PublicLayout from "./layouts/PublicLayout";
+import AuthLayout from "./layouts/AuthLayout";
+import ClientLayout from "./layouts/ClientLayout";
+import BookingShell from "./layouts/BookingShell";
 import "./styles/globals.css";
 
 export default function App() {
   return (
-      <BrowserRouter>
-        <NavBar />
-        <main>
-          <Routes>
-            {/* Public pages */}
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/request-care" element={<RequestCare />} />
-            <Route path="/photo-library" element={<PhotoLibrary />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+    <BrowserRouter>
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route index element={<Home />} />
+          <Route path="services" element={<Services />} />
+          <Route path="about" element={<About />} />
+          <Route path="request-care" element={<RequestCare />} />
+        </Route>
 
-            {/* Auth pages (public) */}
-            <Route path="/create-account" element={<CreateAccount />} />
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route element={<AuthLayout />}>
+          <Route path="sign-in" element={<SignIn />} />
+          <Route path="create-account" element={<CreateAccount />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+        </Route>
 
-            {/* Protected pages */}
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+        <Route
+          element={
+            <ProtectedRoute>
+              <ClientLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="profile" element={<Profile />} />
+          <Route path="add-pet" element={<AddPet />} />
+          <Route path="pet/:petId" element={<PetProfile />} />
+        </Route>
 
-            <Route
-              path="/add-pet"
-              element={
-                <ProtectedRoute>
-                  <AddPet />
-                </ProtectedRoute>
-              }
-            />
+        <Route
+          element={
+            <ProtectedRoute>
+              <BookingShell />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="book/*" element={<BookingLayout />} />
+        </Route>
 
-            <Route path="/book/*" element={<BookingLayout />} />
-
-            <Route
-              path="/pet/:petId"
-              element={
-                <ProtectedRoute>
-                  <PetProfile />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
-        <Footer />
-      </BrowserRouter>
+        <Route path="photo-library" element={<PhotoLibrary />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

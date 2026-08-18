@@ -1,6 +1,5 @@
 import { Box, Typography, Divider, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { useAuthUser } from "../../hooks/auth/useAuthUser";
 import { useProfile } from "../../hooks/useProfile";
 import { useUserPets } from "../../hooks/useUserPets";
@@ -16,12 +15,6 @@ export default function Profile() {
   const { profile, loading: loadingProfile } = useProfile(authUser?.id);
   const { pets, loading: loadingPets } = useUserPets(authUser?.id);
   const logout = useLogout();
-
-  useEffect(() => {
-    if (!loadingUser && !authUser) {
-      navigate("/sign-in");
-    }
-  }, [loadingUser, authUser, navigate]);
 
   if (loadingUser || loadingProfile) {
     return (
