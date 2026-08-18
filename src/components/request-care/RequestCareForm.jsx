@@ -25,7 +25,7 @@ import FormSection from "./FormSection";
 
 const INITIAL_VALUES = {
   fullName: "",
-  email: "x@y.z",
+  email: "",
   phone: "",
   neighborhoodOrZip: "",
   petType: "",
@@ -51,8 +51,10 @@ const TIMING_TYPES = [
   { value: "not_sure", label: "Not sure yet" }
 ];
 
-const displayServiceLabel = (label) =>
-  label.toLowerCase().replace(/(^|\s)\S/g, (character) => character.toUpperCase());
+const displayServiceLabel = (label) => {
+  const normalized = label.toLowerCase();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
 
 const formLabelSx = {
   color: "var(--ink)",
@@ -132,9 +134,11 @@ export default function RequestCareForm({ onSuccess }) {
     <Box
       ref={formRef}
       component="form"
+      method="post"
       noValidate
       onSubmit={handleSubmit}
       aria-label="Care inquiry"
+      aria-busy={loading}
       sx={{ display: "grid", gap: { xs: 5.5, sm: 7 } }}
     >
       <FormSection number="01" id="contact-section-title" title="How can Erin reach you?">
@@ -142,6 +146,7 @@ export default function RequestCareForm({ onSuccess }) {
           <TextField
             required
             label="Full name"
+            name="fullName"
             autoComplete="name"
             value={values.fullName}
             onChange={updateField("fullName")}
@@ -152,9 +157,10 @@ export default function RequestCareForm({ onSuccess }) {
           />
           <TextField
             required
-            label="Test value"
-            type="text"
-            autoComplete="off"
+            label="Email"
+            name="email"
+            type="email"
+            autoComplete="email"
             value={values.email}
             onChange={updateField("email")}
             error={Boolean(errors.email)}
@@ -163,6 +169,7 @@ export default function RequestCareForm({ onSuccess }) {
           />
           <TextField
             label="Phone (optional)"
+            name="phone"
             type="tel"
             autoComplete="tel"
             value={values.phone}
@@ -172,6 +179,7 @@ export default function RequestCareForm({ onSuccess }) {
           <TextField
             required
             label="Neighborhood or ZIP code"
+            name="neighborhoodOrZip"
             value={values.neighborhoodOrZip}
             onChange={updateField("neighborhoodOrZip")}
             error={Boolean(errors.neighborhoodOrZip)}
@@ -205,6 +213,7 @@ export default function RequestCareForm({ onSuccess }) {
           <TextField
             required
             label="How many pets?"
+            name="petCount"
             type="number"
             value={values.petCount}
             onChange={updateField("petCount")}
@@ -215,6 +224,7 @@ export default function RequestCareForm({ onSuccess }) {
 
           <TextField
             label="Pet names (optional)"
+            name="petNames"
             value={values.petNames}
             onChange={updateField("petNames")}
             placeholder="Miso and Olive"
@@ -228,7 +238,9 @@ export default function RequestCareForm({ onSuccess }) {
         <Box sx={{ display: "grid", gap: 4 }}>
           <FormControl required error={Boolean(errors.services)} component="fieldset">
             <FormLabel component="legend" sx={formLabelSx}>Service</FormLabel>
-            <FormHelperText sx={{ mt: -0.75, mb: 1.25, ml: 0 }}>Choose all that apply.</FormHelperText>
+            <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.78rem", lineHeight: 1.55, mt: -0.75, mb: 1.25 }}>
+              Choose all that apply.
+            </Typography>
             <FormGroup
               aria-invalid={Boolean(errors.services)}
               aria-describedby={errors.services ? "services-error" : undefined}
@@ -280,6 +292,7 @@ export default function RequestCareForm({ onSuccess }) {
               <TextField
                 required
                 label="Start date"
+                name="startDate"
                 type="date"
                 value={values.startDate}
                 onChange={updateField("startDate")}
@@ -290,6 +303,7 @@ export default function RequestCareForm({ onSuccess }) {
               <TextField
                 required
                 label="End date"
+                name="endDate"
                 type="date"
                 value={values.endDate}
                 onChange={updateField("endDate")}
@@ -304,6 +318,7 @@ export default function RequestCareForm({ onSuccess }) {
             <TextField
               required
               label="What schedule do you have in mind?"
+              name="recurringSchedule"
               value={values.recurringSchedule}
               onChange={updateField("recurringSchedule")}
               error={Boolean(errors.recurringSchedule)}
@@ -320,6 +335,7 @@ export default function RequestCareForm({ onSuccess }) {
           multiline
           minRows={5}
           label="Pets and routines"
+          name="petRoutineNotes"
           value={values.petRoutineNotes}
           onChange={updateField("petRoutineNotes")}
           error={Boolean(errors.petRoutineNotes)}
