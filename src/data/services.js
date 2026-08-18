@@ -9,18 +9,19 @@ export const SERVICES = [
 export const BOOKABLE_SERVICES = SERVICES.filter(s => s.type === "service");
 export const ADDONS = SERVICES.filter(s => s.type === "addon");
 
-const servicePrice = (label) => SERVICES.find((service) => service.label === label)?.price;
+const serviceByLabel = (label) => SERVICES.find((service) => service.label === label);
 
-export const HOMEPAGE_SERVICES = [
+export const SERVICE_DETAILS = [
   {
     number: "01",
     title: "Cat & Home Visits",
     description:
       "Calm, attentive visits shaped around feeding, litter, companionship, and the small home details that keep everything feeling familiar.",
     prices: [
-      { label: "30-minute visit", value: servicePrice("30-MINUTE VISIT") },
-      { label: "60-minute visit", value: servicePrice("60-MINUTE VISIT") }
-    ]
+      { label: "30-minute visit", service: serviceByLabel("30-MINUTE VISIT") },
+      { label: "60-minute visit", service: serviceByLabel("60-MINUTE VISIT") }
+    ],
+    details: ["Feeding", "Litter care", "Companionship", "Familiar home details"]
   },
   {
     number: "02",
@@ -28,17 +29,27 @@ export const HOMEPAGE_SERVICES = [
     description:
       "Structured, unhurried walks paced to your dog’s comfort, routine, and energy—not a one-size-fits-all route.",
     prices: [
-      { label: "30-minute walk", value: servicePrice("DOG WALK") }
-    ]
-  },
+      { label: "30-minute walk", service: serviceByLabel("DOG WALK") }
+    ],
+    details: ["Comfort-paced walks", "Routine-aware care", "Clear updates"]
+  }
+];
+
+export const HOMEPAGE_SERVICES = [
+  ...SERVICE_DETAILS.map(({ number, title, description, prices }) => ({
+    number,
+    title,
+    description,
+    prices: prices.map(({ label, service }) => ({ label, value: service?.price }))
+  })),
   {
     number: "03",
     title: "Longer Visits & Add-ons",
     description:
       "More time for pets who need it, plus straightforward adjustments for multi-pet homes and holiday care.",
     prices: [
-      { label: "Additional pet", value: servicePrice("ADDITIONAL PET") },
-      { label: "Holiday rate", value: servicePrice("HOLIDAY RATE") }
+      { label: "Additional pet", value: serviceByLabel("ADDITIONAL PET")?.price },
+      { label: "Holiday rate", value: serviceByLabel("HOLIDAY RATE")?.price }
     ]
   }
 ];
