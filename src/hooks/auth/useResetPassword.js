@@ -1,59 +1,112 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "../../utils/supabase";
 
+const INVALID_LINK_MESSAGE = "This reset link is no longer valid. Request a new link to try again.";
+const UPDATE_ERROR_MESSAGE = "We couldn’t update your password just now. Please try again.";
+
+function hasRecoveryIntent(url) {
+  const parsedUrl = new URL(url);
+  const hashParams = new URLSearchParams(parsedUrl.hash.slice(1));
+  return parsedUrl.searchParams.get("type") === "recovery" || hashParams.get("type") === "recovery";
+}
+
 export function useResetPassword() {
-  const [loading, setLoading] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState("verifying");
+  const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
+  const recoveryIntent = useRef(hasRecoveryIntent(window.location.href));
+
+  const clearError = useCallback(() => setErrorMsg(""), []);
 
   useEffect(() => {
-    // Always sign out so Supabase can create a recovery session
-    supabase.auth.signOut();
+    let active = true;
+    let recoveryEventReceived = false;
 
-    const params = new URLSearchParams(window.location.search);
-    const codeFromQuery = params.get("code");
+    const markReady = (session) => {
+      if (!active || !session) return;
+      recoveryEventReceived = true;
+      setErrorMsg("");
+      setVerificationStatus("ready");
+    };
 
-    // Hash format: #access_token=XYZ&type=recovery
-    const hash = window.location.hash.substring(1);
-    const hashParams = new URLSearchParams(hash);
-    const codeFromHash = hashParams.get("access_token");
-
-    const code = codeFromQuery || codeFromHash;
-
-    if (!code) {
-      setErrorMsg("Your reset link is missing required information. Please request a new one.");
-      setLoading(false);
-      return;
-    }
-
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        if (error.message.includes("expired") || error.message.includes("invalid")) {
-          setErrorMsg("This password reset link is invalid or has expired. Please request a new one.");
-        } else {
-          setErrorMsg("We couldn't verify your reset link. Please try again.");
-        }
-      }
-      setLoading(false);
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") markReady(session);
     });
+
+    const verifyRecoverySession = async () => {
+      const { error: initializationError } = await supabase.auth.initialize();
+
+      if (!active || recoveryEventReceived) return;
+
+      if (initializationError || !recoveryIntent.current) {
+        if (import.meta.env.DEV && initializationError) {
+          console.error("Password recovery initialization failed", initializationError);
+        }
+        setErrorMsg(INVALID_LINK_MESSAGE);
+        setVerificationStatus("invalid");
+        return;
+      }
+
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (!active || recoveryEventReceived) return;
+
+      if (sessionError || !data.session) {
+        if (import.meta.env.DEV && sessionError) {
+          console.error("Password recovery session missing", sessionError);
+        }
+        setErrorMsg(INVALID_LINK_MESSAGE);
+        setVerificationStatus("invalid");
+        return;
+      }
+
+      markReady(data.session);
+    };
+
+    verifyRecoverySession();
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const updatePassword = async (password) => {
+    if (submitting || verificationStatus !== "ready") return false;
+
+    setSubmitting(true);
     setErrorMsg("");
 
-    const { error } = await supabase.auth.updateUser({ password });
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
 
-    if (error) {
-      if (error.message.includes("Auth session missing")) {
-        setErrorMsg("Your reset session has expired. Please request a new password reset email.");
-      } else {
-        setErrorMsg("We couldn't update your password. Please try again.");
+      const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
+      if (import.meta.env.DEV && signOutError) {
+        console.error("Recovery session cleanup failed", signOutError);
       }
-      return;
-    }
 
-    setSuccess(true);
+      setSuccess(true);
+      return true;
+    } catch (error) {
+      if (import.meta.env.DEV) console.error("Password update failed", error);
+      setErrorMsg(
+        error?.code === "weak_password"
+          ? "That password doesn’t meet the account requirements. Try a longer password."
+          : UPDATE_ERROR_MESSAGE
+      );
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  return { loading, errorMsg, success, updatePassword };
+  return {
+    verificationStatus,
+    submitting,
+    errorMsg,
+    success,
+    updatePassword,
+    clearError
+  };
 }

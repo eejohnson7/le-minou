@@ -6,9 +6,24 @@ const authLinks = [{ label: "Back to site", to: "/" }];
 
 export default function AuthLayout() {
   return (
-    <Box sx={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        minHeight: "100dvh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "var(--cream)"
+      }}
+    >
       <ShellHeader ariaLabel="Account navigation" links={authLinks} />
-      <Box component="main" sx={{ width: "100%", flex: 1 }}>
+      <Box
+        component="main"
+        sx={{
+          width: "100%",
+          flex: 1,
+          display: "flex",
+          alignItems: { sm: "center" }
+        }}
+      >
         <Outlet />
       </Box>
     </Box>

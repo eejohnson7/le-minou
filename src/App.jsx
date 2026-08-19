@@ -4,7 +4,7 @@ import About from "./pages/About";
 import SignIn from "./pages/Auth/SignIn";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
-import CreateAccount from "./pages/Auth/SignUp";
+import AccountAccess from "./pages/Auth/AccountAccess";
 import Services from "./pages/Services";
 import BookingLayout from "./pages/Book/BookingLayout";
 import Profile from "./pages/Profile/Profile";
@@ -32,7 +32,7 @@ export default function App() {
 
         <Route element={<AuthLayout />}>
           <Route path="sign-in" element={<SignIn />} />
-          <Route path="create-account" element={<CreateAccount />} />
+          <Route path="create-account" element={<AccountAccess />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
         </Route>
