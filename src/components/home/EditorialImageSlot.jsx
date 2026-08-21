@@ -3,7 +3,6 @@ import Typography from "@mui/material/Typography";
 
 export default function EditorialImageSlot({
   children,
-  cropLabel,
   footerLabel,
   mediaSx = {},
   sx = {}
@@ -40,25 +39,6 @@ export default function EditorialImageSlot({
           ...mediaSx
         }}
       >
-        {cropLabel && (
-          <Typography
-            aria-hidden="true"
-            sx={{
-              position: "absolute",
-              top: { xs: 14, sm: 18 },
-              right: { xs: 16, sm: 20 },
-              color: "rgba(152, 0, 97, 0.36)",
-              fontFamily: "monospace",
-              fontSize: "0.67rem",
-              fontWeight: 700,
-              letterSpacing: "0.11em",
-              textTransform: "uppercase"
-            }}
-          >
-            {cropLabel}
-          </Typography>
-        )}
-
         {children}
 
         {footerLabel && (

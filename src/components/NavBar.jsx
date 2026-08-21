@@ -13,14 +13,13 @@ const publicLinks = [
   { label: "Home", to: "/", end: true },
   { label: "Services & Pricing", to: "/services" },
   { label: "About", to: "/about" },
-  { label: "Request Care", to: "/request-care", primary: true },
-  { label: "Client Login", to: "/sign-in", client: true }
+  { label: "Request Care", to: "/request-care", primary: true }
 ];
 
-const navLinkStyles = ({ client = false, primary = false }) => ({
+const navLinkStyles = ({ primary = false }) => ({
   position: "relative",
-  color: primary ? "var(--paper)" : client ? "var(--muted-ink)" : "var(--ink)",
-  fontSize: client ? "0.82rem" : "0.91rem",
+  color: primary ? "var(--paper)" : "var(--ink)",
+  fontSize: "0.91rem",
   fontWeight: 700,
   lineHeight: 1.2,
   textDecoration: "none",
@@ -31,7 +30,7 @@ const navLinkStyles = ({ client = false, primary = false }) => ({
     px: 1.45,
     py: 1
   }),
-  "&::after": client || primary
+  "&::after": primary
     ? undefined
     : {
         content: '""',
@@ -164,15 +163,15 @@ export default function NavBar() {
               onClick={closeMobileNav}
               sx={{
                 width: "100%",
-                color: item.primary ? "var(--paper)" : item.client ? "var(--muted-ink)" : "var(--ink)",
+                color: item.primary ? "var(--paper)" : "var(--ink)",
                 bgcolor: item.primary ? "var(--plum)" : "transparent",
                 borderTop: item.primary ? 0 : "1px solid var(--plum-line-soft)",
                 borderRadius: item.primary ? "8px" : 0,
                 px: item.primary ? 1.5 : 0,
                 py: item.primary ? 1.5 : 1.8,
                 mt: item.primary ? 1.5 : 0,
-                fontFamily: item.client || item.primary ? "var(--font-body)" : "var(--font-display)",
-                fontSize: item.client || item.primary ? "1rem" : "1.55rem",
+                fontFamily: item.primary ? "var(--font-body)" : "var(--font-display)",
+                fontSize: item.primary ? "1rem" : "1.55rem",
                 fontWeight: 700,
                 textDecoration: "none",
                 "&.active": { color: item.primary ? "var(--paper)" : "var(--plum)" }

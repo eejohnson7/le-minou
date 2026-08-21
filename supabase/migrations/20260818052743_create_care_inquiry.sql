@@ -69,7 +69,21 @@ create table public.care_inquiry (
 alter table public.care_inquiry enable row level security;
 
 revoke all on table public.care_inquiry from anon, authenticated;
-grant insert on table public.care_inquiry to anon, authenticated;
+grant insert (
+  full_name,
+  email,
+  phone,
+  neighborhood_or_zip,
+  pet_type,
+  pet_count,
+  pet_names,
+  services,
+  timing_type,
+  start_date,
+  end_date,
+  recurring_schedule,
+  pet_routine_notes
+) on table public.care_inquiry to anon, authenticated;
 grant select, insert, update, delete on table public.care_inquiry to service_role;
 
 create policy "Public visitors can create new care inquiries"

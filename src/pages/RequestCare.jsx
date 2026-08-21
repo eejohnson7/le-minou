@@ -1,8 +1,6 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink } from "react-router-dom";
 import CareRequestSuccess from "../components/request-care/CareRequestSuccess";
 import RequestCareForm from "../components/request-care/RequestCareForm";
 import PageContainer from "../components/layout/PageContainer";
@@ -104,16 +102,6 @@ export default function RequestCare() {
             <Box sx={{ borderTop: "1px solid var(--plum-line)", mt: 3.5, pt: 2.5, maxWidth: 360 }}>
               <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.82rem", lineHeight: 1.7 }}>
                 Please do not include door codes, alarm details, payment information, or full medical records in this form.
-              </Typography>
-              <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.82rem", lineHeight: 1.7, mt: 2 }}>
-                Already a client?{" "}
-                <Link
-                  component={RouterLink}
-                  to="/sign-in"
-                  sx={{ color: "var(--plum)", fontWeight: 700, textUnderlineOffset: "3px" }}
-                >
-                  Sign in to your account.
-                </Link>
               </Typography>
             </Box>
           </Box>

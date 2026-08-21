@@ -18,6 +18,7 @@ export function useCreateCareInquiry() {
     setError("");
 
     try {
+      if (!supabase) throw new Error("Supabase is not configured");
       const { error: insertError } = await supabase.from("care_inquiry").insert(record);
       if (insertError) throw insertError;
       return true;
