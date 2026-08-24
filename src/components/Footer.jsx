@@ -6,8 +6,7 @@ import PageContainer from "./layout/PageContainer";
 const footerLinks = [
   { label: "Services & Pricing", to: "/services" },
   { label: "About", to: "/about" },
-  { label: "Request Care", to: "/request-care" },
-  { label: "Client Login", to: "/sign-in" }
+  { label: "Request Care", to: "/request-care" }
 ];
 
 export default function Footer() {

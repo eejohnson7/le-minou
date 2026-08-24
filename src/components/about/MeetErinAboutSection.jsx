@@ -38,7 +38,6 @@ export default function MeetErinAboutSection() {
       </Box>
 
       <EditorialImageSlot
-        cropLabel="Portrait · 4:5 crop"
         footerLabel="Erin · Owner + caregiver"
         sx={{
           gridArea: "portrait",
