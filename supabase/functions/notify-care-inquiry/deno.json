@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.window"]
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "semiColons": true,
+    "singleQuote": false
+  },
+  "tasks": {
+    "check": "deno check index.ts edge_suite.ts",
+    "lint": "deno lint handler.ts index.ts edge_suite.ts",
+    "test": "deno test edge_suite.ts"
+  }
+}

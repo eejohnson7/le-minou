@@ -1,0 +1,2 @@
+[functions.notify-care-inquiry]
+verify_jwt = false
