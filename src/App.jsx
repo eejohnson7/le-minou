@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound";
 import PrivateAccess from "./pages/PrivateAccess";
 import PublicLayout from "./layouts/PublicLayout";
 import AuthLayout from "./layouts/AuthLayout";
+import Admin from "./pages/Admin/Admin";
 import "./styles/globals.css";
 
 const privateAccessRoutes = [
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="admin" element={<Admin />} />
         <Route element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="services" element={<Services />} />

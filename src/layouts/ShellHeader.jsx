@@ -3,7 +3,7 @@ import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
 import PageContainer from "../components/layout/PageContainer";
 
-export default function ShellHeader({ ariaLabel, links = [] }) {
+export default function ShellHeader({ ariaLabel, links = [], actions }) {
   return (
     <Box
       component="header"
@@ -68,6 +68,7 @@ export default function ShellHeader({ ariaLabel, links = [] }) {
                 {link.label}
               </Box>
             ))}
+            {actions}
           </Box>
         </Box>
       </PageContainer>

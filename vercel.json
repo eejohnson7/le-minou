@@ -1,8 +1,12 @@
 {
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/services", "destination": "/services/index.html" },
+    { "source": "/services/", "destination": "/services/index.html" },
+    { "source": "/about", "destination": "/about/index.html" },
+    { "source": "/about/", "destination": "/about/index.html" },
+    { "source": "/request-care", "destination": "/request-care/index.html" },
+    { "source": "/request-care/", "destination": "/request-care/index.html" },
+    { "source": "/(.*)", "destination": "/private.html" }
   ]
 }
