@@ -1,9 +1,11 @@
 export const SERVICES = [
-  { label: "30-MINUTE VISIT", price: "$15", type: "service" },
-  { label: "60-MINUTE VISIT", price: "$25", type: "service" },
-  { label: "ADDITIONAL PET", price: "+ $5/visit", type: "addon" },
-  { label: "HOLIDAY RATE", price: "+ $5/visit", type: "addon" },
-  { label: "DOG WALK", price: "$20 / 30 minutes", type: "service" }
+  { label: "30-MINUTE VISIT", price: "$28", type: "service" },
+  { label: "60-MINUTE VISIT", price: "$45", type: "service" },
+  { label: "ADDITIONAL CAT", price: "+$5 per visit", type: "addon" },
+  { label: "ADDITIONAL DOG", price: "+$10 per walk", type: "addon" },
+  { label: "HOLIDAY RATE", price: "+25%", type: "addon" },
+  { label: "DOG WALK", price: "$28", type: "service" },
+  { label: "60-MINUTE DOG WALK", price: "$45", type: "service" }
 ];
 
 export const BOOKABLE_SERVICES = SERVICES.filter(s => s.type === "service");
@@ -16,7 +18,7 @@ export const SERVICE_DETAILS = [
     number: "01",
     title: "Cat & Home Visits",
     description:
-      "Calm, attentive visits shaped around feeding, litter, companionship, and the small home details that keep everything feeling familiar.",
+      "Feeding, fresh litter, and company for your cat, plus small tasks around the home.",
     prices: [
       { label: "30-minute visit", service: serviceByLabel("30-MINUTE VISIT") },
       { label: "60-minute visit", service: serviceByLabel("60-MINUTE VISIT") }
@@ -27,9 +29,10 @@ export const SERVICE_DETAILS = [
     number: "02",
     title: "Dog Walks",
     description:
-      "Structured, unhurried walks paced to your dog’s comfort, routine, and energy—not a one-size-fits-all route.",
+      "A walk at your dog’s pace, with time to sniff and explore. You’ll get an update afterward.",
     prices: [
-      { label: "30-minute walk", service: serviceByLabel("DOG WALK") }
+      { label: "30-minute walk", service: serviceByLabel("DOG WALK") },
+      { label: "60-minute walk", service: serviceByLabel("60-MINUTE DOG WALK") }
     ],
     details: ["Comfort-paced walks", "Routine-aware care", "Clear updates"]
   }

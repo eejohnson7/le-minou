@@ -2,8 +2,6 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 export default function ServiceDetail({ service, index = 0 }) {
-  const startingPrice = service.prices[0]?.service?.price;
-
   return (
     <Box
       component="li"
@@ -69,93 +67,30 @@ export default function ServiceDetail({ service, index = 0 }) {
           pl: { md: 3.5 }
         }}
       >
-        {startingPrice && (
-          <Box sx={{ mb: 2.5 }}>
-            <Typography
-              component="p"
+        <Box sx={{ display: "grid" }}>
+          {service.prices.map(({ label, service: priceSource }) => (
+            <Box
+              key={priceSource?.label ?? label}
               sx={{
-                color: "var(--plum)",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.13em",
-                textTransform: "uppercase",
-                mb: 0.35
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 2,
+                borderTop: "1px solid var(--plum-line-soft)",
+                py: 1.15
               }}
             >
-              {service.prices.length > 1 ? "From" : "Price"}
-            </Typography>
-            <Typography
-              sx={{
-                color: "var(--ink)",
-                fontFamily: "var(--font-display)",
-                fontSize: { xs: "1.65rem", md: "1.9rem" },
-                fontWeight: 700
-              }}
-            >
-              {startingPrice}
-            </Typography>
-          </Box>
-        )}
-
-        {service.prices.length > 1 && (
-          <Box sx={{ display: "grid" }}>
-            {service.prices.map(({ label, service: priceSource }) => (
-              <Box
-                key={priceSource?.label ?? label}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                  gap: 2,
-                  borderTop: "1px solid var(--plum-line-soft)",
-                  py: 1.15
-                }}
-              >
-                <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.86rem" }}>
-                  {label}
-                </Typography>
-                <Typography sx={{ color: "var(--ink)", fontSize: "0.9rem", fontWeight: 700, textAlign: "right" }}>
-                  {priceSource?.price}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
+              <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.86rem" }}>
+                {label}
+              </Typography>
+              <Typography sx={{ color: "var(--ink)", fontSize: "0.9rem", fontWeight: 700, textAlign: "right" }}>
+                {priceSource?.price}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
 
-      <Box
-        component="ul"
-        aria-label={`${service.title} details`}
-        sx={{
-          gridColumn: { xs: "2", md: "2 / -1" },
-          display: "flex",
-          flexWrap: "wrap",
-          columnGap: 2.5,
-          rowGap: 1,
-          listStyle: "none",
-          m: 0,
-          p: 0
-        }}
-      >
-        {service.details.map((detail) => (
-          <Box
-            component="li"
-            key={detail}
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.9,
-              color: "var(--muted-ink)",
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              letterSpacing: "0.02em"
-            }}
-          >
-            <Box component="span" aria-hidden="true" sx={{ width: 4, height: 4, borderRadius: "50%", bgcolor: "var(--plum)" }} />
-            {detail}
-          </Box>
-        ))}
-      </Box>
     </Box>
   );
 }
