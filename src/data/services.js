@@ -35,21 +35,11 @@ export const SERVICE_DETAILS = [
   }
 ];
 
-export const HOMEPAGE_SERVICES = [
-  ...SERVICE_DETAILS.map(({ number, title, description, prices }) => ({
-    number,
-    title,
-    description,
-    prices: prices.map(({ label, service }) => ({ label, value: service?.price }))
-  })),
-  {
-    number: "03",
-    title: "Longer Visits & Add-ons",
-    description:
-      "More time for pets who need it, plus straightforward adjustments for multi-pet homes and holiday care.",
-    prices: [
-      { label: "Additional pet", value: serviceByLabel("ADDITIONAL PET")?.price },
-      { label: "Holiday rate", value: serviceByLabel("HOLIDAY RATE")?.price }
-    ]
-  }
-];
+export const HOMEPAGE_SERVICES = SERVICE_DETAILS.map(({ number, title, prices }, index) => ({
+  number,
+  title,
+  description: index === 0
+    ? "Food, fresh litter, and company for your cat."
+    : "A walk at your dog’s pace, with time to sniff and explore.",
+  prices: prices.map(({ label, service }) => ({ label, value: service?.price }))
+}));

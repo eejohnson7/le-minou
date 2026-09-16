@@ -35,9 +35,7 @@ export default function HeroSection() {
       >
         <Box sx={{ maxWidth: 760, position: "relative", zIndex: 1 }}>
           <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: { xs: 1, sm: 1.5 }, mb: 2 }}>
-            <SectionEyebrow>01 · Owner-operated</SectionEyebrow>
-            <Box aria-hidden="true" sx={{ width: { xs: 30, sm: 52 }, height: "1px", bgcolor: "var(--plum-line)" }} />
-            <SectionEyebrow>Cat care · Dog walks · North Side Chicago</SectionEyebrow>
+            <SectionEyebrow>North Side Chicago</SectionEyebrow>
           </Box>
           <Typography
             id="home-title"
@@ -50,7 +48,7 @@ export default function HeroSection() {
               mb: { xs: 2.5, md: 3 }
             }}
           >
-            Care for the routines that make home feel like home.
+            Pet care at home.
           </Typography>
           <Typography
             component="p"
@@ -61,7 +59,7 @@ export default function HeroSection() {
               maxWidth: 660
             }}
           >
-            Le Minou is boutique cat care, dog walking, and thoughtful in-home pet care built around consistency, familiar routines, and clear communication.
+            Cat visits and dog walks with Erin. Familiar routines, happy pets.
           </Typography>
 
           <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: { xs: 1.75, sm: 2.25 }, mt: { xs: 3, md: 4 } }}>
@@ -80,7 +78,7 @@ export default function HeroSection() {
                 "&:hover": { borderColor: "var(--plum)" }
               }}
             >
-              Explore services & pricing
+              Services & pricing
             </Link>
           </Box>
         </Box>

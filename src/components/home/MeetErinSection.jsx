@@ -29,20 +29,17 @@ export default function MeetErinSection() {
       </EditorialImageSlot>
 
       <Box>
-        <SectionEyebrow sx={{ mb: 1.5 }}>05 · Meet Erin</SectionEyebrow>
+        <SectionEyebrow sx={{ mb: 1.5 }}>Meet Erin</SectionEyebrow>
         <Typography
           id="meet-erin-title"
           component="h2"
           variant="h2"
           sx={{ color: "var(--ink)", fontSize: { xs: "2.5rem", sm: "3.2rem", md: "4rem" }, lineHeight: 1.02, mb: 3 }}
         >
-          A steady presence, with the details already in mind.
+          Hi, I’m Erin.
         </Typography>
         <Typography sx={{ color: "var(--ink)", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.8, fontWeight: 700 }}>
-          Le Minou is owner-operated. Erin is the person clients meet, the person who learns the routines, and the person who shows up for pets and home.
-        </Typography>
-        <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.8, mt: 2 }}>
-          The business began as a practical answer to a familiar problem: finding pet care that felt genuinely trustworthy. Erin was already the person friends and neighbors called—the one who noticed routines, tracked the little things, and brought calm into the home.
+          I run Le Minou and care for your pets myself. I’ll get to know their routines so they feel comfortable while you’re away.
         </Typography>
         <Link
           component={RouterLink}
@@ -59,7 +56,7 @@ export default function MeetErinSection() {
             "&:hover svg": { transform: "translateX(4px)" }
           }}
         >
-          Read Erin&apos;s story <ArrowForwardRoundedIcon sx={{ fontSize: 19 }} />
+          More about me <ArrowForwardRoundedIcon sx={{ fontSize: 19 }} />
         </Link>
       </Box>
     </Section>

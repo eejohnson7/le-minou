@@ -9,9 +9,7 @@ export default function ServicesSection() {
     <Section aria-labelledby="services-title" sx={{ bgcolor: "var(--blush)" }}>
       <SectionHeading
         id="services-title"
-        eyebrow="03 · Services"
-        title="Care shaped around the pet—not the template."
-        description="Straightforward options for the routines that matter most, with pricing kept clear and secondary to the care itself."
+        title="A little help with pet care."
       />
       <Box sx={{ borderBottom: "1px solid var(--plum-line)" }}>
         {HOMEPAGE_SERVICES.map((service) => (

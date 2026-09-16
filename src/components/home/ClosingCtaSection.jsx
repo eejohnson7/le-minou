@@ -45,7 +45,7 @@ export default function ClosingCtaSection() {
           variant="h2"
           sx={{ color: "var(--ink)", fontSize: { xs: "3.1rem", sm: "4.6rem", md: "5.8rem" }, lineHeight: 0.93, maxWidth: 900 }}
         >
-          Tell me about the pets who run your home.
+          Need a hand?
         </Typography>
       </Box>
       <Box
