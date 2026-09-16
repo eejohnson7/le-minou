@@ -4,7 +4,6 @@ import Typography from "@mui/material/Typography";
 import CareRequestSuccess from "../components/request-care/CareRequestSuccess";
 import RequestCareForm from "../components/request-care/RequestCareForm";
 import PageContainer from "../components/layout/PageContainer";
-import { SectionEyebrow } from "../components/layout/SectionHeading";
 
 export default function RequestCare() {
   const [submittedName, setSubmittedName] = useState("");
@@ -49,7 +48,6 @@ export default function RequestCare() {
           }}
         >
           <Box sx={{ maxWidth: 800 }}>
-            <SectionEyebrow sx={{ mb: 1.5 }}>Request Care</SectionEyebrow>
             <Typography
               id="request-care-title"
               component="h1"
@@ -61,16 +59,13 @@ export default function RequestCare() {
                 maxWidth: 760
               }}
             >
-              Tell me what care looks like at your house.
+              Request care.
             </Typography>
           </Box>
 
           <Box sx={{ borderLeft: { md: "1px solid var(--plum-line)" }, pl: { md: 4 }, pb: { md: 0.5 } }}>
             <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.06rem" }, lineHeight: 1.78 }}>
-              Share the pets, routine, and timing you have in mind. Erin will review the details and follow up about fit and next steps.
-            </Typography>
-            <Typography sx={{ color: "var(--ink)", fontSize: "0.86rem", fontWeight: 700, lineHeight: 1.65, mt: 2 }}>
-              Sending a request does not reserve dates or confirm care.
+              Tell me what you need. I’ll email you about availability.
             </Typography>
           </Box>
         </PageContainer>
@@ -86,22 +81,21 @@ export default function RequestCare() {
           }}
         >
           <Box sx={{ position: { md: "sticky" }, top: { md: 112 } }}>
-            <SectionEyebrow sx={{ mb: 1.5 }}>The inquiry</SectionEyebrow>
             <Typography
               id="inquiry-form-title"
               component="h2"
               variant="h2"
               sx={{ color: "var(--ink)", fontSize: { xs: "2.35rem", md: "3rem" }, lineHeight: 1.02, maxWidth: 340 }}
             >
-              The basics are plenty for now.
+              A few details.
             </Typography>
             <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.96rem", lineHeight: 1.75, mt: 2.25, maxWidth: 360 }}>
-              No account is needed. Detailed care plans, home access, and medical information can wait until you decide to move forward.
+              No account needed. We can discuss the details later.
             </Typography>
 
             <Box sx={{ borderTop: "1px solid var(--plum-line)", mt: 3.5, pt: 2.5, maxWidth: 360 }}>
               <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.82rem", lineHeight: 1.7 }}>
-                Please do not include door codes, alarm details, payment information, or full medical records in this form.
+                Please leave out door codes, payment details, and medical records.
               </Typography>
             </Box>
           </Box>

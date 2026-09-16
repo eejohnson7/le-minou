@@ -1,14 +1,17 @@
 export const SERVICES = [
-  { label: "30-MINUTE VISIT", price: "$28", type: "service" },
-  { label: "60-MINUTE VISIT", price: "$45", type: "service" },
+  { label: "30-MINUTE VISIT", petType: "cat", displayLabel: "30-min cat visit", price: "$28", type: "service" },
+  { label: "60-MINUTE VISIT", petType: "cat", displayLabel: "60-min cat visit", price: "$45", type: "service" },
   { label: "ADDITIONAL CAT", price: "+$5 per visit", type: "addon" },
   { label: "ADDITIONAL DOG", price: "+$10 per walk", type: "addon" },
   { label: "HOLIDAY RATE", price: "+25%", type: "addon" },
-  { label: "DOG WALK", price: "$28", type: "service" },
-  { label: "60-MINUTE DOG WALK", price: "$45", type: "service" }
+  { label: "DOG WALK", petType: "dog", displayLabel: "30-min dog walk", price: "$28", type: "service" },
+  { label: "60-MINUTE DOG WALK", petType: "dog", displayLabel: "60-min dog walk", price: "$45", type: "service" }
 ];
 
 export const BOOKABLE_SERVICES = SERVICES.filter(s => s.type === "service");
+export const servicesForPetType = (petType) =>
+  BOOKABLE_SERVICES.filter(service => petType === "both" || service.petType === petType);
+
 export const ADDONS = SERVICES.filter(s => s.type === "addon");
 
 const serviceByLabel = (label) => SERVICES.find((service) => service.label === label);

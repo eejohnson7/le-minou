@@ -14,7 +14,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { BOOKABLE_SERVICES } from "../../data/services";
+import { servicesForPetType } from "../../data/services";
 import { useCreateCareInquiry } from "../../hooks/useCreateCareInquiry";
 import {
   CARE_INQUIRY_LIMITS,
@@ -47,14 +47,9 @@ const PET_TYPES = [
 
 const TIMING_TYPES = [
   { value: "specific_dates", label: "Specific dates" },
-  { value: "recurring", label: "Ongoing / recurring care" },
+  { value: "recurring", label: "Regular visits" },
   { value: "not_sure", label: "Not sure yet" }
 ];
-
-const displayServiceLabel = (label) => {
-  const normalized = label.toLowerCase();
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-};
 
 const formLabelSx = {
   color: "var(--ink)",
@@ -87,8 +82,14 @@ export default function RequestCareForm({ onSuccess }) {
   };
 
   const updatePetType = (event) => {
-    setValues((current) => ({ ...current, petType: event.target.value }));
-    clearFieldErrors("petType");
+    const petType = event.target.value;
+    const allowedLabels = servicesForPetType(petType).map(service => service.label);
+    setValues((current) => ({
+      ...current,
+      petType,
+      services: current.services.filter(label => allowedLabels.includes(label))
+    }));
+    clearFieldErrors("petType", "services");
     clearError();
   };
 
@@ -141,7 +142,7 @@ export default function RequestCareForm({ onSuccess }) {
       aria-busy={loading}
       sx={{ display: "grid", gap: { xs: 5.5, sm: 7 } }}
     >
-      <FormSection number="01" id="contact-section-title" title="How can Erin reach you?">
+      <FormSection number="01" id="contact-section-title" title="Your details">
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" }, gap: 2.25 }}>
           <TextField
             required
@@ -168,29 +169,20 @@ export default function RequestCareForm({ onSuccess }) {
             slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.email } }}
           />
           <TextField
-            label="Phone (optional)"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            value={values.phone}
-            onChange={updateField("phone")}
-            slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.phone } }}
-          />
-          <TextField
             required
             label="Neighborhood or ZIP code"
             name="neighborhoodOrZip"
             value={values.neighborhoodOrZip}
             onChange={updateField("neighborhoodOrZip")}
             error={Boolean(errors.neighborhoodOrZip)}
-            helperText={errors.neighborhoodOrZip || "This helps Erin confirm whether the request is within the service area."}
+            helperText={errors.neighborhoodOrZip}
             slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.neighborhoodOrZip } }}
             sx={{ gridColumn: { sm: "1 / -1" } }}
           />
         </Box>
       </FormSection>
 
-      <FormSection number="02" id="pets-section-title" title="Who needs care?" description="A quick household overview is enough—full pet profiles can come later.">
+      <FormSection number="02" id="pets-section-title" title="Your pets">
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "minmax(0, 1fr) minmax(150px, 0.42fr)" }, gap: 2.25 }}>
           <FormControl required error={Boolean(errors.petType)} component="fieldset">
             <FormLabel component="legend" sx={formLabelSx}>What kind of pets?</FormLabel>
@@ -222,31 +214,36 @@ export default function RequestCareForm({ onSuccess }) {
             slotProps={{ htmlInput: { min: 1, max: CARE_INQUIRY_LIMITS.petCount, step: 1, inputMode: "numeric" } }}
           />
 
-          <TextField
-            label="Pet names (optional)"
-            name="petNames"
-            value={values.petNames}
-            onChange={updateField("petNames")}
-            placeholder="Miso and Olive"
-            slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.petNames } }}
-            sx={{ gridColumn: { sm: "1 / -1" } }}
-          />
         </Box>
+        <TextField
+          required
+          multiline
+          fullWidth
+          minRows={3}
+          sx={{ mt: 3 }}
+          label="A little about your pets"
+          name="petRoutineNotes"
+          value={values.petRoutineNotes}
+          onChange={updateField("petRoutineNotes")}
+          error={Boolean(errors.petRoutineNotes)}
+          helperText={errors.petRoutineNotes || "A sentence or two about their routine is enough."}
+          slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.petRoutineNotes } }}
+        />
       </FormSection>
 
-      <FormSection number="03" id="care-section-title" title="What care do you have in mind?">
+      <FormSection number="03" id="care-section-title" title="Care and dates">
         <Box sx={{ display: "grid", gap: 4 }}>
           <FormControl required error={Boolean(errors.services)} component="fieldset">
             <FormLabel component="legend" sx={formLabelSx}>Service</FormLabel>
             <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.78rem", lineHeight: 1.55, mt: -0.75, mb: 1.25 }}>
-              Choose all that apply.
+              {!values.petType ? "Choose your pet type above first." : values.petType === "both" ? "Choose the visits and walks you need." : "Choose all that apply."}
             </Typography>
             <FormGroup
               aria-invalid={Boolean(errors.services)}
               aria-describedby={errors.services ? "services-error" : undefined}
               sx={{ borderBottom: "1px solid var(--plum-line-soft)" }}
             >
-              {BOOKABLE_SERVICES.map((service) => (
+              {servicesForPetType(values.petType).map((service) => (
                 <FormControlLabel
                   key={service.label}
                   control={
@@ -257,7 +254,7 @@ export default function RequestCareForm({ onSuccess }) {
                       value={service.label}
                     />
                   }
-                  label={displayServiceLabel(service.label)}
+                  label={service.displayLabel}
                   sx={{
                     m: 0,
                     py: 1.15,
@@ -317,32 +314,18 @@ export default function RequestCareForm({ onSuccess }) {
           {values.timingType === "recurring" && (
             <TextField
               required
-              label="What schedule do you have in mind?"
+              label="Preferred schedule"
               name="recurringSchedule"
               value={values.recurringSchedule}
               onChange={updateField("recurringSchedule")}
               error={Boolean(errors.recurringSchedule)}
-              helperText={errors.recurringSchedule || "For example: Weekdays around lunchtime."}
+              helperText={errors.recurringSchedule || "For example: Weekdays at noon."}
               slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.recurringSchedule } }}
             />
           )}
         </Box>
       </FormSection>
 
-      <FormSection number="04" id="routine-section-title" title="Tell me about your pets and their routines">
-        <TextField
-          required
-          multiline
-          minRows={5}
-          label="Pets and routines"
-          name="petRoutineNotes"
-          value={values.petRoutineNotes}
-          onChange={updateField("petRoutineNotes")}
-          error={Boolean(errors.petRoutineNotes)}
-          helperText={errors.petRoutineNotes || "Share their usual routine, temperament, what they enjoy, and anything important Erin should know."}
-          slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.petRoutineNotes } }}
-        />
-      </FormSection>
 
       <Box sx={{ borderTop: "1px solid var(--plum-line)", pt: { xs: 3.5, sm: 4.5 } }}>
         {submissionError && (
@@ -360,7 +343,7 @@ export default function RequestCareForm({ onSuccess }) {
           {loading ? "Sending request…" : "Send care request"}
         </Button>
         <Typography sx={{ color: "var(--muted-ink)", fontSize: "0.8rem", lineHeight: 1.65, mt: 1.75, maxWidth: 560 }}>
-          This sends an inquiry to Erin. It does not create an account, charge you, or confirm a booking.
+          No payment now. Care is confirmed after we talk.
         </Typography>
       </Box>
     </Box>

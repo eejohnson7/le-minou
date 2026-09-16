@@ -40,13 +40,13 @@ export default function CareRequestSuccess({ name }) {
               outline: "none"
             }}
           >
-            Got it{firstName ? `, ${firstName}` : ""} — I have the basics.
+            Thanks{firstName ? `, ${firstName}` : ""}!
           </Typography>
           <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.8, mt: 3, maxWidth: 650 }}>
-            Your care request was received. Erin will review what you shared and follow up about fit and next steps.
+            I’ve received your request and will email you about availability.
           </Typography>
           <Typography sx={{ color: "var(--ink)", fontSize: "0.9rem", fontWeight: 700, lineHeight: 1.7, mt: 2 }}>
-            This is not a confirmed booking or a reservation of dates.
+            Your dates aren’t booked yet.
           </Typography>
         </Box>
 
@@ -55,7 +55,7 @@ export default function CareRequestSuccess({ name }) {
             Back home
           </Button>
           <Link component={RouterLink} to="/services" sx={{ color: "var(--plum)", fontSize: "0.92rem", fontWeight: 700, textUnderlineOffset: "4px" }}>
-            Review services &amp; pricing
+            Services &amp; pricing
           </Link>
         </Box>
       </PageContainer>

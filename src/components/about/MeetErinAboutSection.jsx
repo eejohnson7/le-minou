@@ -3,7 +3,6 @@ import Typography from "@mui/material/Typography";
 import logo from "../../assets/logo.png";
 import EditorialImageSlot from "../home/EditorialImageSlot";
 import Section from "../layout/Section";
-import { SectionEyebrow } from "../layout/SectionHeading";
 
 export default function MeetErinAboutSection() {
   return (
@@ -13,27 +12,26 @@ export default function MeetErinAboutSection() {
       containerSx={{
         display: "grid",
         gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1.08fr) minmax(320px, 0.92fr)" },
-        gridTemplateAreas: { xs: '"intro" "portrait" "detail"', md: '"intro portrait" "detail portrait"' },
+        gridTemplateAreas: { xs: '"intro" "portrait"', md: '"intro portrait"' },
         columnGap: { md: 9, lg: 12 },
         rowGap: { xs: 5, md: 4 },
-        alignItems: "start"
+        alignItems: "center"
       }}
     >
-      <Box sx={{ gridArea: "intro", alignSelf: "end" }}>
-        <SectionEyebrow sx={{ mb: 1.5 }}>Meet Erin</SectionEyebrow>
+      <Box sx={{ gridArea: "intro" }}>
         <Typography
           id="about-erin-title"
           component="h2"
           variant="h2"
           sx={{ color: "var(--ink)", fontSize: { xs: "2.65rem", sm: "3.35rem", md: "4.1rem" }, lineHeight: 1, maxWidth: 620 }}
         >
-          One person, from the first conversation onward.
+          A familiar face for your pets.
         </Typography>
         <Typography sx={{ color: "var(--ink)", fontSize: { xs: "1.02rem", md: "1.1rem" }, fontWeight: 700, lineHeight: 1.8, mt: 3, maxWidth: 660 }}>
-          Erin is the owner and caregiver behind Le Minou. She is the person clients meet, the person who learns how each pet moves through the day, and the person who returns to care for them in their own home.
+          Le Minou began with caring for friends’ and neighbors’ pets. Today, I still handle every visit myself.
         </Typography>
         <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.06rem" }, lineHeight: 1.8, mt: 2, maxWidth: 650 }}>
-          That continuity is intentional. It gives pets a familiar presence and gives clients a direct relationship with the person following the routine, caring for the home, and paying attention when something feels different.
+          I follow your pet’s usual routine, take time to help them feel comfortable, and keep you updated while you’re away.
         </Typography>
       </Box>
 
@@ -52,17 +50,6 @@ export default function MeetErinAboutSection() {
         <Box component="img" src={logo} alt="" sx={{ width: "58%", height: "auto", opacity: 0.88 }} />
       </EditorialImageSlot>
 
-      <Box sx={{ gridArea: "detail", alignSelf: "start" }}>
-        <Box sx={{ borderTop: "1px solid var(--plum-line)", pt: 2.75 }}>
-          <SectionEyebrow sx={{ mb: 1.25 }}>A useful background</SectionEyebrow>
-          <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "0.98rem", md: "1.03rem" }, lineHeight: 1.8, maxWidth: 650 }}>
-            Erin&apos;s background in backend engineering reinforced habits that matter here too: documenting details, thinking through edge cases, and building reliable systems. Those habits shape how Le Minou is run, with thoughtful preparation and less room for guesswork.
-          </Typography>
-        </Box>
-        <Typography sx={{ color: "var(--ink)", fontFamily: "var(--font-display)", fontSize: { xs: "1.28rem", md: "1.48rem" }, fontWeight: 700, lineHeight: 1.5, mt: 3.5, maxWidth: 620 }}>
-          She has always been drawn to the quieter rhythms of animals: the expressive stillness of cats, the grounding pattern of a dog walk, and the trust that grows through familiarity.
-        </Typography>
-      </Box>
     </Section>
   );
 }

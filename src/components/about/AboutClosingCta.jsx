@@ -23,7 +23,7 @@ export default function AboutClosingCta() {
         alignItems: "start"
       }}
     >
-      <SectionEyebrow sx={{ pt: { md: 1 } }}>The next conversation</SectionEyebrow>
+      <SectionEyebrow sx={{ pt: { md: 1 } }}>Get in touch</SectionEyebrow>
       <Box>
         <Typography
           id="about-closing-title"
@@ -31,10 +31,10 @@ export default function AboutClosingCta() {
           variant="h2"
           sx={{ color: "var(--ink)", fontSize: { xs: "2.65rem", sm: "3.6rem", md: "4.15rem" }, lineHeight: 1, maxWidth: 800 }}
         >
-          Every good care plan starts with an introduction.
+          Let’s meet your pets.
         </Typography>
         <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.06rem" }, lineHeight: 1.8, maxWidth: 650, mt: 2.5 }}>
-          Share who your pets are, what their days look like, and what would help you feel comfortable while you are away.
+          Tell me a little about them and when you need care.
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: { xs: 2, sm: 2.5 }, mt: 3.5 }}>
           <CtaLink to="/request-care">Request care</CtaLink>
@@ -51,7 +51,7 @@ export default function AboutClosingCta() {
               "&:hover": { borderColor: "var(--plum)" }
             }}
           >
-            View services &amp; pricing
+            Services &amp; pricing
           </Link>
         </Box>
       </Box>
