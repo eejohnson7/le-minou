@@ -1,4 +1,4 @@
-export const SERVICES = [
+const SERVICES = [
   { label: "30-MINUTE VISIT", petType: "cat", displayLabel: "30-min cat visit", price: "$28", type: "service" },
   { label: "60-MINUTE VISIT", petType: "cat", displayLabel: "60-min cat visit", price: "$45", type: "service" },
   { label: "ADDITIONAL CAT", price: "+$5 per visit", type: "addon" },
@@ -8,7 +8,7 @@ export const SERVICES = [
   { label: "60-MINUTE DOG WALK", petType: "dog", displayLabel: "60-min dog walk", price: "$45", type: "service" }
 ];
 
-export const BOOKABLE_SERVICES = SERVICES.filter(s => s.type === "service");
+const BOOKABLE_SERVICES = SERVICES.filter(s => s.type === "service");
 export const servicesForPetType = (petType) =>
   BOOKABLE_SERVICES.filter(service => petType === "both" || service.petType === petType);
 
@@ -25,8 +25,7 @@ export const SERVICE_DETAILS = [
     prices: [
       { label: "30-minute visit", service: serviceByLabel("30-MINUTE VISIT") },
       { label: "60-minute visit", service: serviceByLabel("60-MINUTE VISIT") }
-    ],
-    details: ["Feeding", "Litter care", "Companionship", "Familiar home details"]
+    ]
   },
   {
     number: "02",
@@ -36,8 +35,7 @@ export const SERVICE_DETAILS = [
     prices: [
       { label: "30-minute walk", service: serviceByLabel("DOG WALK") },
       { label: "60-minute walk", service: serviceByLabel("60-MINUTE DOG WALK") }
-    ],
-    details: ["Comfort-paced walks", "Routine-aware care", "Clear updates"]
+    ]
   }
 ];
 

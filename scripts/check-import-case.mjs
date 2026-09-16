@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 const trackedFiles = execFileSync("git", ["ls-files", "src"], { encoding: "utf8" })
   .trim()
   .split("\n")
-  .filter(Boolean);
+  .filter((file) => file && fs.existsSync(file));
 const trackedByLowerCase = new Map(trackedFiles.map((file) => [file.toLowerCase(), file]));
 const importPattern = /(?:from\s+|import\s*)["']([^"']+)["']/g;
 const failures = [];
