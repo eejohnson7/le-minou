@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import catCarePhoto from "../../assets/photos/cat-care.jpg";
 import CtaLink from "../layout/CtaLink";
 import PageContainer from "../layout/PageContainer";
 import { SectionEyebrow } from "../layout/SectionHeading";
@@ -84,7 +84,6 @@ export default function HeroSection() {
         </Box>
 
         <EditorialImageSlot
-          footerLabel="Cats · Dogs · Home"
           sx={{
             width: { xs: "calc(100% - 1rem)", sm: "min(84%, 470px)", md: "100%" },
             maxWidth: 450,
@@ -93,30 +92,19 @@ export default function HeroSection() {
             transform: { md: "translateY(1.5rem)" }
           }}
         >
-          <Typography
-            aria-hidden="true"
-            sx={{
-              position: "absolute",
-              top: { xs: 12, md: 28 },
-              left: { xs: 18, md: 24 },
-              color: "rgba(152, 0, 97, 0.1)",
-              fontFamily: "var(--font-display)",
-              fontSize: { xs: "4rem", md: "6rem" },
-              fontWeight: 700,
-              lineHeight: 1
-            }}
-          >
-            01
-          </Typography>
           <Box
             component="img"
-            src={logo}
-            alt="Le Minou cat mark"
+            src={catCarePhoto}
+            alt="A fluffy orange cat enjoying a gentle scratch behind the ear"
+            width={768}
+            height={1024}
+            fetchPriority="high"
             sx={{
-              width: { xs: "58%", sm: "54%", md: "70%" },
-              height: "auto",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "50% 55%",
               display: "block",
-              transform: { xs: "translate(12%, 2%)", md: "translate(3%, -1%)" }
             }}
           />
         </EditorialImageSlot>

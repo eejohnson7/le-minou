@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import logo from "../../assets/logo.png";
+import aboutPhoto from "../../assets/photos/about-dog.jpg";
 import EditorialImageSlot from "../home/EditorialImageSlot";
 import Section from "../layout/Section";
 
@@ -28,15 +28,14 @@ export default function MeetErinAboutSection() {
           A familiar face for your pets.
         </Typography>
         <Typography sx={{ color: "var(--ink)", fontSize: { xs: "1.02rem", md: "1.1rem" }, fontWeight: 700, lineHeight: 1.8, mt: 3, maxWidth: 660 }}>
-          Le Minou began with caring for friends’ and neighbors’ pets. Today, I still handle every visit myself.
+          I started pet sitting on the side in Louisiana in 2024 while working full time. I moved to Chicago in 2025, was laid off in August, and returned to pet sitting that November. That’s how Le Minou began.
         </Typography>
         <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.06rem" }, lineHeight: 1.8, mt: 2, maxWidth: 650 }}>
-          I follow your pet’s usual routine, take time to help them feel comfortable, and keep you updated while you’re away.
+          I’ve cared for puppies, senior dogs, and cats, including giving medication to cats and dogs. I also worked at a veterinary clinic during college.
         </Typography>
       </Box>
 
       <EditorialImageSlot
-        footerLabel="Erin · Owner + caregiver"
         sx={{
           gridArea: "portrait",
           width: { xs: "calc(100% - 1rem)", sm: "min(78%, 480px)", md: "calc(100% - 1rem)" },
@@ -47,7 +46,15 @@ export default function MeetErinAboutSection() {
         }}
         mediaSx={{ aspectRatio: "4 / 5", bgcolor: "var(--paper)" }}
       >
-        <Box component="img" src={logo} alt="" sx={{ width: "58%", height: "auto", opacity: 0.88 }} />
+        <Box
+          component="img"
+          src={aboutPhoto}
+          alt="A small fluffy dog being held outdoors"
+          width={360}
+          height={480}
+          loading="lazy"
+          sx={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }}
+        />
       </EditorialImageSlot>
 
     </Section>

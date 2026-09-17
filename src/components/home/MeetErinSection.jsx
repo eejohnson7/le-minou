@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { Link as RouterLink } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import erinPhoto from "../../assets/photos/erin.jpg";
 import Section from "../layout/Section";
 import { SectionEyebrow } from "../layout/SectionHeading";
 import EditorialImageSlot from "./EditorialImageSlot";
@@ -21,11 +21,18 @@ export default function MeetErinSection() {
       }}
     >
       <EditorialImageSlot
-        footerLabel="Owner + caregiver"
         sx={{ width: "calc(100% - 1rem)", maxWidth: 460, mr: 1 }}
         mediaSx={{ aspectRatio: "4 / 5", bgcolor: "var(--paper)" }}
       >
-        <Box component="img" src={logo} alt="" sx={{ width: "58%", height: "auto", opacity: 0.88 }} />
+        <Box
+          component="img"
+          src={erinPhoto}
+          alt="Erin, owner and caregiver at Le Minou"
+          width={360}
+          height={480}
+          loading="lazy"
+          sx={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
       </EditorialImageSlot>
 
       <Box>
