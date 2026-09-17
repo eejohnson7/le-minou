@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField, Typography } from "@mui/material";
 import { supabase } from "../../utils/supabase";
-import { STATUSES, petLabel, timingLabel, titleCase } from "./requestLabels";
+import { STATUSES, petLabel, receivedLabel, timingLabel, titleCase } from "./requestLabels";
 
 const serviceLabels = { "30-MINUTE VISIT": "30-min cat visit", "60-MINUTE VISIT": "60-min cat visit", "DOG WALK": "30-min dog walk", "60-MINUTE DOG WALK": "60-min dog walk" };
 export default function RequestDetail({ id, onClose, onSaved }) {
@@ -37,6 +37,7 @@ export default function RequestDetail({ id, onClose, onSaved }) {
     finally { inFlight.current = false; if (alive.current) setBusy(false); }
   }
   const details = request ? [
+    ["Received", receivedLabel(request.created_at)],
     ["Email", request.email], ["Phone", request.phone], ["Area", request.neighborhood_or_zip],
     ["Pets", `${petLabel(request.pet_type)} · ${request.pet_count}`], ["Pet names", request.pet_names],
     ["Care", request.services.map(value => serviceLabels[value] || value).join(", ")],

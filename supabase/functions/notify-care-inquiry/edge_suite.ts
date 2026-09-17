@@ -85,7 +85,7 @@ function createHarness(options: HarnessOptions = {}) {
     ["RESEND_API_KEY", RESEND_KEY],
     ["INQUIRY_TO_EMAIL", "configured-owner@example.com"],
     ["INQUIRY_FROM_EMAIL", "Le Minou <care@example.org>"],
-    ["INQUIRY_REVIEW_URL", "https://supabase.com/dashboard/project/test/editor"],
+    ["INQUIRY_REVIEW_URL", "https://leminou-chi.com/admin"],
     ["SUPABASE_URL", "https://test-project.supabase.co"],
     ["SUPABASE_SECRET_KEYS", JSON.stringify({ default: SUPABASE_SECRET_KEY })],
   ]);
@@ -595,4 +595,17 @@ Deno.test("receipt escapes names and handles missing names, recurring care, and 
   );
   assert(undecided.text.includes("Not provided"));
   assert(undecided.text.includes("Not sure yet"));
+});
+
+Deno.test("owner email defaults to the admin link when no review URL is configured", async () => {
+  const harness = createHarness();
+  harness.environment.delete("INQUIRY_REVIEW_URL");
+  assertEquals((await harness.handler(webhookRequest())).status, 200);
+  const email = JSON.parse(String(harness.lastResendRequest()!.init.body));
+  assert(email.text.includes("Open admin: https://leminou-chi.com/admin"));
+  assert(email.html.includes('href="https://leminou-chi.com/admin"'));
+  assert(email.html.includes(">Open admin</a>"));
+  const client = harness.resendRequests().find((request) => request.audience === "client");
+  assert(client);
+  assertStringExcludes(String(client.init.body), ["/admin", "Open admin"]);
 });

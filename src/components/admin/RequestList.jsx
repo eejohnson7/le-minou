@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Alert, Box, Button, ButtonBase, Chip, CircularProgress, Typography } from "@mui/material";
 import { supabase } from "../../utils/supabase";
-import { STATUSES, petLabel, timingLabel, titleCase } from "./requestLabels";
+import { STATUSES, petLabel, receivedLabel, timingLabel, titleCase } from "./requestLabels";
 import RequestDetail from "./RequestDetail";
 
 const PAGE_SIZE = 25;
@@ -55,6 +55,9 @@ export default function RequestList() {
                 <Typography sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{request.full_name}</Typography>
                 <Typography color="text.secondary">{petLabel(request.pet_type)}</Typography>
                 <Typography color="text.secondary" sx={{ overflowWrap: "anywhere" }}>{timingLabel(request)}</Typography>
+                <Typography color="text.secondary" sx={{ fontSize: "0.85rem", mt: 0.75 }}>
+                  Received {receivedLabel(request.created_at)}
+                </Typography>
               </Box>
               <Chip label={titleCase(request.status)} size="small" sx={{ justifySelf: "start", bgcolor: "var(--soft-pink)" }} />
             </ButtonBase>

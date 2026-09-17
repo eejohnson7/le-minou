@@ -1,6 +1,7 @@
 const JSON_CONTENT_TYPE = "application/json";
 const MAX_BODY_BYTES = 64 * 1024;
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
+const DEFAULT_ADMIN_URL = "https://leminou-chi.com/admin";
 const WEBHOOK_SECRET_HEADER = "x-le-minou-webhook-secret";
 
 const INQUIRY_ID_PATTERN =
@@ -138,7 +139,7 @@ function parseRuntimeConfig(getEnv: EnvironmentReader): RuntimeConfig {
     throw new SafeProcessingError("configuration_error", 500);
   }
 
-  const rawReviewUrl = getEnv("INQUIRY_REVIEW_URL")?.trim();
+  const rawReviewUrl = getEnv("INQUIRY_REVIEW_URL")?.trim() || DEFAULT_ADMIN_URL;
   let reviewUrl: string | undefined;
   if (rawReviewUrl) {
     try {
@@ -302,7 +303,7 @@ export function buildEmailContent(
   const intro = audience === "owner"
     ? "A new care request was received."
     : "Thanks for your request! Erin will email you about availability. Your booking isn’t confirmed yet.";
-  const ownerLink = audience === "owner" ? reviewUrl : undefined;
+  const ownerLink = audience === "owner" ? (reviewUrl || DEFAULT_ADMIN_URL) : undefined;
   return {
     subject: audience === "owner" ? "New Le Minou care inquiry" : "Le Minou — request received",
     text: [
@@ -314,7 +315,7 @@ export function buildEmailContent(
       "",
       `Inquiry reference: ${event.inquiryId}`,
       `Received: ${event.receivedAt}`,
-      ...(ownerLink ? [`Review request: ${ownerLink}`] : []),
+      ...(ownerLink ? [`Open admin: ${ownerLink}`] : []),
       ...(audience === "client" ? ["", "You can reply to this email with questions."] : []),
     ].join("\n"),
     html: [
@@ -327,7 +328,11 @@ export function buildEmailContent(
       ),
       `<p><strong>Inquiry reference:</strong> ${escapeHtml(event.inquiryId)}<br>`,
       `<strong>Received:</strong> ${escapeHtml(event.receivedAt)}</p>`,
-      ownerLink ? `<p><a href="${escapeHtml(ownerLink)}">Review request</a></p>` : "",
+      ownerLink
+        ? `<p><a href="${
+          escapeHtml(ownerLink)
+        }" style="display:inline-block;background:#980061;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Open admin</a></p>`
+        : "",
       audience === "client" ? "<p>You can reply to this email with questions.</p>" : "",
       "</div>",
     ].join(""),
