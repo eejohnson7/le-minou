@@ -45,6 +45,26 @@ type ValidatedEvent = {
   receivedAtForClaim: string;
 };
 
+type Audience = "owner" | "client";
+export type InquiryDetails = {
+  full_name: string;
+  email: string;
+  pet_names: string | null;
+  pet_type: string;
+  pet_count: number;
+  services: string[];
+  timing_type: string;
+  start_date: string | null;
+  end_date: string | null;
+  recurring_schedule: string | null;
+};
+
+function ledgerFunction(action: string, audience: Audience): string {
+  return `${action}_care_inquiry_${
+    audience === "client" ? "client_confirmation" : "notification"
+  }_delivery`;
+}
+
 class SafeProcessingError extends Error {
   constructor(
     readonly code: string,
@@ -245,39 +265,123 @@ export function escapeHtml(value: string): string {
   );
 }
 
-export function buildEmailContent(event: ValidatedEvent, reviewUrl?: string) {
-  const inquiryId = escapeHtml(event.inquiryId);
-  const receivedAt = escapeHtml(event.receivedAt);
-  const reviewText = reviewUrl ? `\nReview link: ${reviewUrl}` : "";
-  const reviewHtml = reviewUrl
-    ? `<p><a href="${escapeHtml(reviewUrl)}">Open the secure inquiry review page</a></p>`
-    : "";
+const serviceLabels: Record<string, string> = {
+  "30-MINUTE VISIT": "30-min cat visit",
+  "60-MINUTE VISIT": "60-min cat visit",
+  "DOG WALK": "30-min dog walk",
+  "60-MINUTE DOG WALK": "60-min dog walk",
+};
 
+export function buildEmailContent(
+  event: ValidatedEvent,
+  details: InquiryDetails,
+  reviewUrl?: string,
+  audience: Audience = "owner",
+) {
+  const timing = details.timing_type === "specific_dates"
+    ? details.start_date === details.end_date
+      ? details.start_date!
+      : `${details.start_date} to ${details.end_date}`
+    : details.timing_type === "recurring"
+    ? details.recurring_schedule!
+    : "Not sure yet";
+  const rows = [
+    ["Client", details.full_name],
+    ["Email", details.email],
+    ["Pet names", details.pet_names || "Not provided"],
+    [
+      "Pets",
+      `${
+        ({ cat: "Cat", dog: "Dog", both: "Cat & dog" } as Record<string, string>)[details.pet_type]
+      } · ${details.pet_count}`,
+    ],
+    ["Care", details.services.map((service) => serviceLabels[service] || service).join(", ")],
+    ["When", timing],
+  ];
+  const heading = audience === "owner" ? "New care request" : "Request received";
+  const intro = audience === "owner"
+    ? "A new care request was received."
+    : "Thanks for your request! Erin will email you about availability. Your booking isn’t confirmed yet.";
+  const ownerLink = audience === "owner" ? reviewUrl : undefined;
   return {
-    subject: "New Le Minou care inquiry",
+    subject: audience === "owner" ? "New Le Minou care inquiry" : "Le Minou — request received",
     text: [
       "Le Minou",
       "",
-      "A new care inquiry was received.",
+      intro,
+      "",
+      ...rows.map(([label, value]) => `${label}: ${value}`),
       "",
       `Inquiry reference: ${event.inquiryId}`,
       `Received: ${event.receivedAt}`,
-      reviewText,
-      "",
-      "Review the full inquiry in the secure Supabase Dashboard.",
+      ...(ownerLink ? [`Review request: ${ownerLink}`] : []),
+      ...(audience === "client" ? ["", "You can reply to this email with questions."] : []),
     ].join("\n"),
     html: [
       '<div style="font-family:Arial,sans-serif;color:#292126;line-height:1.6">',
-      '<p style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6f3b55">Le Minou</p>',
-      '<h1 style="font-family:Georgia,serif;font-size:26px;font-weight:500">New care inquiry</h1>',
-      "<p>A new care inquiry was received.</p>",
-      `<p><strong>Inquiry reference:</strong> ${inquiryId}<br>`,
-      `<strong>Received:</strong> ${receivedAt}</p>`,
-      reviewHtml,
-      "<p>Review the full inquiry in the secure Supabase Dashboard.</p>",
+      '<p style="color:#980061;font-weight:bold">Le Minou</p>',
+      `<h1 style="font-family:Georgia,serif;font-size:26px">${heading}</h1>`,
+      `<p>${escapeHtml(intro)}</p>`,
+      ...rows.map(([label, value]) =>
+        `<p><strong>${label}:</strong> ${escapeHtml(value).replace(/\r?\n/g, "<br>")}</p>`
+      ),
+      `<p><strong>Inquiry reference:</strong> ${escapeHtml(event.inquiryId)}<br>`,
+      `<strong>Received:</strong> ${escapeHtml(event.receivedAt)}</p>`,
+      ownerLink ? `<p><a href="${escapeHtml(ownerLink)}">Review request</a></p>` : "",
+      audience === "client" ? "<p>You can reply to this email with questions.</p>" : "",
       "</div>",
     ].join(""),
   };
+}
+
+async function loadInquiryDetails(
+  fetcher: Fetcher,
+  config: RuntimeConfig,
+  event: ValidatedEvent,
+): Promise<InquiryDetails> {
+  const query = new URLSearchParams({
+    id: `eq.${event.inquiryId}`,
+    created_at: `eq.${event.receivedAtForClaim}`,
+    select:
+      "full_name,email,pet_names,pet_type,pet_count,services,timing_type,start_date,end_date,recurring_schedule",
+  });
+  let response: Response;
+  try {
+    response = await fetcher(`${config.supabaseUrl}/rest/v1/care_inquiry?${query}`, {
+      headers: { apikey: config.supabaseSecretKey },
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!response.ok) throw new Error("lookup failed");
+    const rows = await response.json();
+    if (!Array.isArray(rows) || rows.length !== 1) {
+      throw new SafeProcessingError("inquiry_event_not_found", 422);
+    }
+    const row = rows[0];
+    if (
+      typeof row.full_name !== "string" || !row.full_name.trim() || row.full_name.length > 120 ||
+      typeof row.email !== "string" || row.email.length > 254 || !EMAIL_PATTERN.test(row.email) ||
+      (row.pet_names !== null &&
+        (typeof row.pet_names !== "string" || row.pet_names.length > 250)) ||
+      !["cat", "dog", "both"].includes(row.pet_type) || !Number.isInteger(row.pet_count) ||
+      row.pet_count < 1 || row.pet_count > 20 ||
+      !Array.isArray(row.services) || row.services.length < 1 || row.services.length > 4 ||
+      row.services.some((value: unknown) =>
+        typeof value !== "string" || !(value in serviceLabels)
+      ) ||
+      !["specific_dates", "recurring", "not_sure"].includes(row.timing_type) ||
+      (row.timing_type === "specific_dates" &&
+        (typeof row.start_date !== "string" || typeof row.end_date !== "string")) ||
+      (row.timing_type === "recurring" &&
+        (typeof row.recurring_schedule !== "string" || !row.recurring_schedule.trim() ||
+          row.recurring_schedule.length > 500))
+    ) {
+      throw new SafeProcessingError("inquiry_details_invalid", 422);
+    }
+    return row as InquiryDetails;
+  } catch (error) {
+    if (error instanceof SafeProcessingError) throw error;
+    throw new SafeProcessingError("inquiry_lookup_failed", 502);
+  }
 }
 
 async function callLedgerRpc(
@@ -314,11 +418,12 @@ async function claimDelivery(
   fetcher: Fetcher,
   config: RuntimeConfig,
   event: ValidatedEvent,
+  audience: Audience,
 ): Promise<ClaimResult> {
   const result = await callLedgerRpc(
     fetcher,
     config,
-    "claim_care_inquiry_notification_delivery",
+    ledgerFunction("claim", audience),
     {
       p_inquiry_id: event.inquiryId,
       p_inquiry_created_at: event.receivedAtForClaim,
@@ -353,9 +458,7 @@ async function claimDelivery(
 async function finalizeDelivery(
   fetcher: Fetcher,
   config: RuntimeConfig,
-  functionName:
-    | "complete_care_inquiry_notification_delivery"
-    | "fail_care_inquiry_notification_delivery",
+  functionName: string,
   body: Record<string, string>,
 ): Promise<boolean> {
   const result = await callLedgerRpc(fetcher, config, functionName, body);
@@ -373,8 +476,10 @@ async function sendEmail(
   fetcher: Fetcher,
   config: RuntimeConfig,
   event: ValidatedEvent,
+  details: InquiryDetails,
+  audience: Audience,
 ): Promise<string> {
-  const content = buildEmailContent(event, config.reviewUrl);
+  const content = buildEmailContent(event, details, config.reviewUrl, audience);
   let response: Response;
 
   try {
@@ -383,11 +488,14 @@ async function sendEmail(
       headers: {
         Authorization: `Bearer ${config.resendApiKey}`,
         "Content-Type": JSON_CONTENT_TYPE,
-        "Idempotency-Key": `care-inquiry/${event.inquiryId}`,
+        "Idempotency-Key": audience === "owner"
+          ? `care-inquiry/${event.inquiryId}`
+          : `care-inquiry-confirmation/${event.inquiryId}`,
       },
       body: JSON.stringify({
         from: config.fromEmail,
-        to: [config.toEmail],
+        to: [audience === "owner" ? config.toEmail : details.email],
+        reply_to: audience === "owner" ? details.email : config.toEmail,
         subject: content.subject,
         text: content.text,
         html: content.html,
@@ -412,6 +520,123 @@ async function sendEmail(
   } catch {
     throw new SafeProcessingError("provider_response_invalid", 502, "provider_response_invalid");
   }
+}
+
+async function deliverEmail(
+  dependencies: HandlerDependencies,
+  config: RuntimeConfig,
+  event: ValidatedEvent,
+  details: InquiryDetails,
+  audience: Audience,
+): Promise<Response> {
+  let claim: ClaimResult;
+  try {
+    claim = await claimDelivery(dependencies.fetch, config, event, audience);
+  } catch (error) {
+    const code = error instanceof SafeProcessingError ? error.code : "ledger_request_failed";
+    dependencies.logger.error(code, { inquiry_id: event.inquiryId, audience });
+    return jsonResponse(502, code, { inquiry_id: event.inquiryId, audience });
+  }
+
+  if (claim.claim_status === "sent") {
+    dependencies.logger.info("notification_already_sent", {
+      inquiry_id: event.inquiryId,
+      audience,
+    });
+    return jsonResponse(200, "already_sent", { inquiry_id: event.inquiryId, audience });
+  }
+
+  if (claim.claim_status === "busy") {
+    dependencies.logger.info("notification_processing", { inquiry_id: event.inquiryId, audience });
+    return jsonResponse(202, "processing", { inquiry_id: event.inquiryId, audience });
+  }
+
+  if (claim.claim_status === "manual_review") {
+    dependencies.logger.warn("notification_manual_review_required", {
+      inquiry_id: event.inquiryId,
+      audience,
+    });
+    return jsonResponse(409, "manual_review_required", { inquiry_id: event.inquiryId, audience });
+  }
+
+  if (claim.claim_status === "invalid") {
+    dependencies.logger.warn("inquiry_event_not_found", { inquiry_id: event.inquiryId, audience });
+    return jsonResponse(422, "inquiry_event_not_found", { inquiry_id: event.inquiryId, audience });
+  }
+
+  const claimToken = claim.claim_token as string;
+  dependencies.logger.info("notification_claimed", {
+    inquiry_id: event.inquiryId,
+    audience,
+    attempt_count: claim.attempt_count,
+  });
+
+  let providerMessageId: string;
+  try {
+    providerMessageId = await sendEmail(dependencies.fetch, config, event, details, audience);
+  } catch (error) {
+    const processingError = error instanceof SafeProcessingError
+      ? error
+      : new SafeProcessingError("notification_delivery_failed", 502, "provider_request_failed");
+    const ledgerError = processingError.ledgerError ?? "provider_request_failed";
+
+    let failureRecorded = false;
+    try {
+      failureRecorded = await finalizeDelivery(
+        dependencies.fetch,
+        config,
+        ledgerFunction("fail", audience),
+        {
+          p_inquiry_id: event.inquiryId,
+          p_claim_token: claimToken,
+          p_last_error: ledgerError,
+        },
+      );
+    } catch {
+      failureRecorded = false;
+    }
+
+    if (!failureRecorded) {
+      dependencies.logger.error("ledger_failure_record_failed", {
+        inquiry_id: event.inquiryId,
+        audience,
+      });
+    }
+
+    dependencies.logger.error(ledgerError, { inquiry_id: event.inquiryId, audience });
+    return jsonResponse(processingError.status, processingError.code, {
+      inquiry_id: event.inquiryId,
+      audience,
+    });
+  }
+
+  let completed = false;
+  try {
+    completed = await finalizeDelivery(
+      dependencies.fetch,
+      config,
+      ledgerFunction("complete", audience),
+      {
+        p_inquiry_id: event.inquiryId,
+        p_claim_token: claimToken,
+        p_provider_message_id: providerMessageId,
+      },
+    );
+  } catch {
+    completed = false;
+  }
+
+  if (!completed) {
+    dependencies.logger.error("ledger_finalize_failed", { inquiry_id: event.inquiryId, audience });
+    return jsonResponse(502, "ledger_finalize_failed", { inquiry_id: event.inquiryId, audience });
+  }
+
+  dependencies.logger.info("notification_sent", {
+    inquiry_id: event.inquiryId,
+    audience,
+    attempt_count: claim.attempt_count,
+  });
+  return jsonResponse(200, "sent", { inquiry_id: event.inquiryId, audience });
 }
 
 export function createHandler(overrides: Partial<HandlerDependencies> = {}) {
@@ -479,103 +704,29 @@ export function createHandler(overrides: Partial<HandlerDependencies> = {}) {
       return jsonResponse(400, "malformed_request");
     }
 
-    let claim: ClaimResult;
+    let details: InquiryDetails;
     try {
-      claim = await claimDelivery(dependencies.fetch, config, event);
+      details = await loadInquiryDetails(dependencies.fetch, config, event);
     } catch (error) {
-      const code = error instanceof SafeProcessingError ? error.code : "ledger_request_failed";
-      dependencies.logger.error(code, { inquiry_id: event.inquiryId });
-      return jsonResponse(502, code, { inquiry_id: event.inquiryId });
+      const failure = error instanceof SafeProcessingError
+        ? error
+        : new SafeProcessingError("inquiry_lookup_failed", 502);
+      dependencies.logger.error(failure.code, { inquiry_id: event.inquiryId });
+      return jsonResponse(failure.status, failure.code, { inquiry_id: event.inquiryId });
     }
-
-    if (claim.claim_status === "sent") {
-      dependencies.logger.info("notification_already_sent", { inquiry_id: event.inquiryId });
-      return jsonResponse(200, "already_sent", { inquiry_id: event.inquiryId });
-    }
-
-    if (claim.claim_status === "busy") {
-      dependencies.logger.info("notification_processing", { inquiry_id: event.inquiryId });
+    // Separate claims mean either recipient can succeed even if the other send fails.
+    const owner = await deliverEmail(dependencies, config, event, details, "owner");
+    const client = await deliverEmail(dependencies, config, event, details, "client");
+    if (!owner.ok) return owner;
+    if (!client.ok) return client;
+    if (owner.status === 202 || client.status === 202) {
       return jsonResponse(202, "processing", { inquiry_id: event.inquiryId });
     }
-
-    if (claim.claim_status === "manual_review") {
-      dependencies.logger.warn("notification_manual_review_required", {
-        inquiry_id: event.inquiryId,
-      });
-      return jsonResponse(409, "manual_review_required", { inquiry_id: event.inquiryId });
-    }
-
-    if (claim.claim_status === "invalid") {
-      dependencies.logger.warn("inquiry_event_not_found", { inquiry_id: event.inquiryId });
-      return jsonResponse(422, "inquiry_event_not_found", { inquiry_id: event.inquiryId });
-    }
-
-    const claimToken = claim.claim_token as string;
-    dependencies.logger.info("notification_claimed", {
-      inquiry_id: event.inquiryId,
-      attempt_count: claim.attempt_count,
-    });
-
-    let providerMessageId: string;
-    try {
-      providerMessageId = await sendEmail(dependencies.fetch, config, event);
-    } catch (error) {
-      const processingError = error instanceof SafeProcessingError
-        ? error
-        : new SafeProcessingError("notification_delivery_failed", 502, "provider_request_failed");
-      const ledgerError = processingError.ledgerError ?? "provider_request_failed";
-
-      let failureRecorded = false;
-      try {
-        failureRecorded = await finalizeDelivery(
-          dependencies.fetch,
-          config,
-          "fail_care_inquiry_notification_delivery",
-          {
-            p_inquiry_id: event.inquiryId,
-            p_claim_token: claimToken,
-            p_last_error: ledgerError,
-          },
-        );
-      } catch {
-        failureRecorded = false;
-      }
-
-      if (!failureRecorded) {
-        dependencies.logger.error("ledger_failure_record_failed", { inquiry_id: event.inquiryId });
-      }
-
-      dependencies.logger.error(ledgerError, { inquiry_id: event.inquiryId });
-      return jsonResponse(processingError.status, processingError.code, {
-        inquiry_id: event.inquiryId,
-      });
-    }
-
-    let completed = false;
-    try {
-      completed = await finalizeDelivery(
-        dependencies.fetch,
-        config,
-        "complete_care_inquiry_notification_delivery",
-        {
-          p_inquiry_id: event.inquiryId,
-          p_claim_token: claimToken,
-          p_provider_message_id: providerMessageId,
-        },
-      );
-    } catch {
-      completed = false;
-    }
-
-    if (!completed) {
-      dependencies.logger.error("ledger_finalize_failed", { inquiry_id: event.inquiryId });
-      return jsonResponse(502, "ledger_finalize_failed", { inquiry_id: event.inquiryId });
-    }
-
-    dependencies.logger.info("notification_sent", {
-      inquiry_id: event.inquiryId,
-      attempt_count: claim.attempt_count,
-    });
-    return jsonResponse(200, "sent", { inquiry_id: event.inquiryId });
+    const results = await Promise.all([owner.json(), client.json()]);
+    return jsonResponse(
+      200,
+      results.every((result) => result.code === "already_sent") ? "already_sent" : "sent",
+      { inquiry_id: event.inquiryId },
+    );
   };
 }

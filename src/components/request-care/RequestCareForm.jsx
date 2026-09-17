@@ -214,6 +214,14 @@ export default function RequestCareForm({ onSuccess }) {
             slotProps={{ htmlInput: { min: 1, max: CARE_INQUIRY_LIMITS.petCount, step: 1, inputMode: "numeric" } }}
           />
 
+          <TextField
+            label="Pet names (optional)"
+            name="petNames"
+            value={values.petNames}
+            onChange={updateField("petNames")}
+            slotProps={{ htmlInput: { maxLength: CARE_INQUIRY_LIMITS.petNames } }}
+            sx={{ gridColumn: { sm: "1 / -1" } }}
+          />
         </Box>
         <TextField
           required

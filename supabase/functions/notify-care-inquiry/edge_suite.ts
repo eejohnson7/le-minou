@@ -1,4 +1,10 @@
-import { buildEmailContent, createHandler, escapeHtml, type SafeLogger } from "./handler.ts";
+import {
+  buildEmailContent,
+  createHandler,
+  escapeHtml,
+  type InquiryDetails,
+  type SafeLogger,
+} from "./handler.ts";
 
 const INQUIRY_ID = "11111111-1111-4111-8111-111111111111";
 const CLAIM_TOKEN = "22222222-2222-4222-8222-222222222222";
@@ -26,6 +32,14 @@ const validPayload = {
     created_at: "2026-08-30T17:00:00.000Z",
     full_name: "Private Visitor",
     email: PRIVATE_VALUES.email,
+    pet_names: "Miso & Olive",
+    pet_type: "both",
+    pet_count: 2,
+    services: ["30-MINUTE VISIT", "60-MINUTE DOG WALK"],
+    timing_type: "specific_dates",
+    start_date: "2026-09-20",
+    end_date: "2026-09-21",
+    recurring_schedule: null,
     phone: PRIVATE_VALUES.phone,
     neighborhood_or_zip: PRIVATE_VALUES.address,
     pet_routine_notes: PRIVATE_VALUES.notes,
@@ -41,7 +55,10 @@ type LedgerState = "new" | "processing" | "sent" | "failed";
 type HarnessOptions = {
   completeSucceeds?: boolean;
   initialState?: LedgerState;
-  providerResponse?: () => Promise<Response> | Response;
+  clientInitialState?: LedgerState;
+  lookupFails?: boolean;
+  invalidStoredEmail?: boolean;
+  providerResponse?: (audience: "owner" | "client") => Promise<Response> | Response;
 };
 
 function assert(condition: unknown, message = "assertion failed"): asserts condition {
@@ -80,87 +97,90 @@ function createHarness(options: HarnessOptions = {}) {
     error: (event, context = {}) => logs.push({ level: "error", event, context }),
   };
 
-  let ledgerState = options.initialState ?? "new";
-  let attemptCount = ledgerState === "new" ? 0 : 1;
-  let resendCount = 0;
+  const states = {
+    owner: options.initialState ?? "new",
+    client: options.clientInitialState ?? options.initialState ?? "new",
+  };
+  const attempts = {
+    owner: states.owner === "new" ? 0 : 1,
+    client: states.client === "new" ? 0 : 1,
+  };
+  const resendRequests: Array<{ url: string; init: RequestInit; audience: "owner" | "client" }> =
+    [];
   let lastClaimRequest: { url: string; init: RequestInit } | undefined;
-  let lastResendRequest: { url: string; init: RequestInit } | undefined;
   let failedError: string | undefined;
-
   const fetcher = async (input: string | URL | Request, init: RequestInit = {}) => {
     const url = typeof input === "string"
       ? input
       : input instanceof URL
       ? input.toString()
       : input.url;
-
-    if (url.endsWith("/rpc/claim_care_inquiry_notification_delivery")) {
-      lastClaimRequest = { url, init };
-      const body = JSON.parse(String(init.body)) as Record<string, string>;
+    const audience = url.includes("client_confirmation") ? "client" : "owner";
+    if (url.includes("/rest/v1/care_inquiry?")) {
+      if (options.lookupFails) return new Response(null, { status: 500 });
+      assertEquals(new Headers(init.headers).get("apikey"), SUPABASE_SECRET_KEY);
+      const params = new URL(url).searchParams;
+      if (
+        params.get("id") !== `eq.${INQUIRY_ID}` ||
+        params.get("created_at") !== `eq.${validPayload.record.created_at}`
+      ) return Response.json([]);
+      return Response.json([{
+        ...validPayload.record,
+        ...(options.invalidStoredEmail ? { email: "bad\r\nBcc:other@example.test" } : {}),
+      }]);
+    }
+    if (url.includes("/rpc/claim_care_inquiry_")) {
+      if (audience === "owner") lastClaimRequest = { url, init };
+      const body = JSON.parse(String(init.body));
       if (
         body.p_inquiry_id !== INQUIRY_ID ||
         body.p_inquiry_created_at !== validPayload.record.created_at
       ) {
+        return Response.json([{ claim_status: "invalid", claim_token: null, attempt_count: 0 }]);
+      }
+      if (states[audience] === "sent" || states[audience] === "processing") {
         return Response.json([{
-          claim_status: "invalid",
+          claim_status: states[audience] === "sent" ? "sent" : "busy",
           claim_token: null,
-          attempt_count: 0,
+          attempt_count: attempts[audience],
         }]);
       }
-
-      if (ledgerState === "sent") {
-        return Response.json([{
-          claim_status: "sent",
-          claim_token: null,
-          attempt_count: attemptCount,
-        }]);
-      }
-      if (ledgerState === "processing") {
-        return Response.json([{
-          claim_status: "busy",
-          claim_token: null,
-          attempt_count: attemptCount,
-        }]);
-      }
-
-      ledgerState = "processing";
-      attemptCount += 1;
+      states[audience] = "processing";
+      attempts[audience]++;
       return Response.json([{
         claim_status: "claimed",
         claim_token: CLAIM_TOKEN,
-        attempt_count: attemptCount,
+        attempt_count: attempts[audience],
       }]);
     }
-
-    if (url.endsWith("/rpc/complete_care_inquiry_notification_delivery")) {
-      const body = JSON.parse(String(init.body)) as Record<string, string>;
-      const completed = options.completeSucceeds !== false && ledgerState === "processing" &&
+    if (url.includes("/rpc/complete_care_inquiry_")) {
+      const body = JSON.parse(String(init.body));
+      const completed = options.completeSucceeds !== false && states[audience] === "processing" &&
         body.p_claim_token === CLAIM_TOKEN;
-      if (completed) ledgerState = "sent";
+      if (completed) states[audience] = "sent";
       return Response.json(completed);
     }
-
-    if (url.endsWith("/rpc/fail_care_inquiry_notification_delivery")) {
-      const body = JSON.parse(String(init.body)) as Record<string, string>;
-      const failed = ledgerState === "processing" && body.p_claim_token === CLAIM_TOKEN;
+    if (url.includes("/rpc/fail_care_inquiry_")) {
+      const body = JSON.parse(String(init.body));
+      const failed = states[audience] === "processing" && body.p_claim_token === CLAIM_TOKEN;
       if (failed) {
-        ledgerState = "failed";
+        states[audience] = "failed";
         failedError = body.p_last_error;
       }
       return Response.json(failed);
     }
-
     if (url === "https://api.resend.com/emails") {
-      resendCount += 1;
-      lastResendRequest = { url, init };
+      const kind =
+        new Headers(init.headers).get("Idempotency-Key")?.startsWith("care-inquiry-confirmation/")
+          ? "client"
+          : "owner";
+      resendRequests.push({ url, init, audience: kind });
       return options.providerResponse
-        ? await options.providerResponse()
+        ? await options.providerResponse(kind)
         : Response.json({ id: PROVIDER_MESSAGE_ID });
     }
-
     return new Response(null, { status: 404 });
   };
-
   return {
     environment,
     fetcher: fetcher as typeof fetch,
@@ -170,11 +190,14 @@ function createHarness(options: HarnessOptions = {}) {
       logger,
     }),
     logs,
-    state: () => ledgerState,
-    attemptCount: () => attemptCount,
-    resendCount: () => resendCount,
+    state: () => states.owner,
+    clientState: () => states.client,
+    attemptCount: () => attempts.owner,
+    resendCount: () => resendRequests.length,
     lastClaimRequest: () => lastClaimRequest,
-    lastResendRequest: () => lastResendRequest,
+    lastResendRequest: () =>
+      resendRequests.filter((request) => request.audience === "owner").at(-1),
+    resendRequests: () => resendRequests,
     failedError: () => failedError,
   };
 }
@@ -289,11 +312,11 @@ Deno.test("fails safely when required environment configuration is missing", asy
   assertEquals(harness.resendCount(), 0);
 });
 
-Deno.test("a first valid insert sends once with configured recipient and stable idempotency key", async () => {
+Deno.test("a first valid insert sends two emails with configured recipient and stable idempotency key", async () => {
   const harness = createHarness();
   const response = await harness.handler(webhookRequest());
   assertEquals(response.status, 200);
-  assertEquals(harness.resendCount(), 1);
+  assertEquals(harness.resendCount(), 2);
   assertEquals(harness.state(), "sent");
 
   const claimRequest = harness.lastClaimRequest();
@@ -316,16 +339,26 @@ Deno.test("a first valid insert sends once with configured recipient and stable 
   assertEquals(email.from, "Le Minou <care@example.org>");
 
   const serializedEmail = JSON.stringify(email);
-  assertStringExcludes(serializedEmail, Object.values(PRIVATE_VALUES));
+  assert(serializedEmail.includes(PRIVATE_VALUES.email));
+  assert(serializedEmail.includes("Private Visitor"));
+  assert(serializedEmail.includes("Miso & Olive"));
+  assertStringExcludes(
+    serializedEmail,
+    Object.entries(PRIVATE_VALUES).filter(([key]) => key !== "email").map(([, value]) => value),
+  );
   assertStringExcludes(serializedEmail, [WEBHOOK_SECRET, SUPABASE_SECRET_KEY, RESEND_KEY]);
 });
 
 Deno.test("HTML-escapes every row-derived value used by the email builder", () => {
-  const content = buildEmailContent({
-    inquiryId: "<reference&\"'>",
-    receivedAt: "<timestamp&\"'>",
-    receivedAtForClaim: "<timestamp&\"'>",
-  }, "https://example.com/review?a=1&b=2");
+  const content = buildEmailContent(
+    {
+      inquiryId: "<reference&\"'>",
+      receivedAt: "<timestamp&\"'>",
+      receivedAtForClaim: "<timestamp&\"'>",
+    },
+    { ...validPayload.record, full_name: "<name&\"'>", pet_names: "<pet&\"'>" } as InquiryDetails,
+    "https://example.com/review?a=1&b=2",
+  );
 
   assert(content.html.includes("&lt;reference&amp;&quot;&#39;&gt;"));
   assert(content.html.includes("&lt;timestamp&amp;&quot;&#39;&gt;"));
@@ -352,7 +385,8 @@ Deno.test("concurrent duplicate deliveries do not send twice", async () => {
   });
 
   const harness = createHarness({
-    providerResponse: async () => {
+    providerResponse: async (audience) => {
+      if (audience === "client") return Response.json({ id: PROVIDER_MESSAGE_ID });
       markProviderStarted();
       await providerGate;
       return Response.json({ id: "55555555-5555-4555-8555-555555555555" });
@@ -364,12 +398,12 @@ Deno.test("concurrent duplicate deliveries do not send twice", async () => {
   const duplicate = await harness.handler(webhookRequest());
   assertEquals(duplicate.status, 202);
   assertEquals((await duplicate.json()).code, "processing");
-  assertEquals(harness.resendCount(), 1);
+  assertEquals(harness.resendCount(), 2);
 
   releaseProvider();
   const firstResponse = await first;
   assertEquals(firstResponse.status, 200);
-  assertEquals(harness.resendCount(), 1);
+  assertEquals(harness.resendCount(), 2);
 });
 
 Deno.test("provider acceptance with a failed ledger completion stays fenced", async () => {
@@ -379,12 +413,12 @@ Deno.test("provider acceptance with a failed ledger completion stays fenced", as
   assertEquals(first.status, 502);
   assertEquals((await first.json()).code, "ledger_finalize_failed");
   assertEquals(harness.state(), "processing");
-  assertEquals(harness.resendCount(), 1);
+  assertEquals(harness.resendCount(), 2);
 
   const immediateRetry = await harness.handler(webhookRequest());
   assertEquals(immediateRetry.status, 202);
   assertEquals((await immediateRetry.json()).code, "processing");
-  assertEquals(harness.resendCount(), 1);
+  assertEquals(harness.resendCount(), 2);
 });
 
 Deno.test("a provider non-2xx records a sanitized failure and returns non-2xx", async () => {
@@ -422,7 +456,7 @@ Deno.test("a failed attempt can be retried within the documented provider window
   const retry = await harness.handler(webhookRequest());
   assertEquals(retry.status, 200);
   assertEquals(harness.state(), "sent");
-  assertEquals(harness.resendCount(), 2);
+  assertEquals(harness.resendCount(), 3);
   assertEquals(harness.attemptCount(), 2);
 });
 
@@ -439,4 +473,126 @@ Deno.test("logs and returned errors exclude secrets and inquiry PII", async () =
     "configured-owner@example.com",
     "care@example.org",
   ]);
+});
+
+Deno.test("client gets a separate receipt without the admin link and can reply to the owner", async () => {
+  const harness = createHarness();
+  assertEquals((await harness.handler(webhookRequest())).status, 200);
+  const request = harness.resendRequests().find((request) => request.audience === "client");
+  assert(request);
+  assertEquals(
+    new Headers(request.init.headers).get("idempotency-key"),
+    `care-inquiry-confirmation/${INQUIRY_ID}`,
+  );
+  const email = JSON.parse(String(request.init.body));
+  assertEquals(email.to, [PRIVATE_VALUES.email]);
+  assertEquals(email.reply_to, "configured-owner@example.com");
+  assertEquals(email.cc, undefined);
+  assertEquals(email.bcc, undefined);
+  for (
+    const detail of [
+      "Your booking isn’t confirmed yet.",
+      "Miso & Olive",
+      "30-min cat visit, 60-min dog walk",
+      "2026-09-20 to 2026-09-21",
+    ]
+  ) assert(email.text.includes(detail));
+  assertStringExcludes(JSON.stringify(email), [
+    "supabase.com/dashboard",
+    "/admin",
+    PRIVATE_VALUES.notes,
+    PRIVATE_VALUES.accessCode,
+  ]);
+  assertEquals(
+    JSON.parse(String(harness.lastResendRequest()!.init.body)).reply_to,
+    PRIVATE_VALUES.email,
+  );
+});
+
+Deno.test("a partial failure retries only the failed recipient", async () => {
+  for (const failedAudience of ["owner", "client"] as const) {
+    let failures = 0;
+    const harness = createHarness({
+      providerResponse: (audience) => {
+        if (audience === failedAudience && failures++ === 0) {
+          return new Response(null, { status: 503 });
+        }
+        return Response.json({ id: PROVIDER_MESSAGE_ID });
+      },
+    });
+    assertEquals((await harness.handler(webhookRequest())).status, 502);
+    assertEquals(harness.state(), failedAudience === "owner" ? "failed" : "sent");
+    assertEquals(harness.clientState(), failedAudience === "client" ? "failed" : "sent");
+    assertEquals((await harness.handler(webhookRequest())).status, 200);
+    assertEquals(harness.resendRequests().map((request) => request.audience), [
+      "owner",
+      "client",
+      failedAudience,
+    ]);
+    assertEquals(harness.state(), "sent");
+    assertEquals(harness.clientState(), "sent");
+  }
+});
+
+Deno.test("a previously sent owner email stays sent while the client receipt is tracked separately", async () => {
+  const harness = createHarness({ initialState: "sent", clientInitialState: "new" });
+  assertEquals((await harness.handler(webhookRequest())).status, 200);
+  assertEquals(harness.resendRequests().map((request) => request.audience), ["client"]);
+  assertEquals((await harness.handler(webhookRequest())).status, 200);
+  assertEquals(harness.resendCount(), 1);
+});
+
+Deno.test("uses stored details instead of forged webhook recipients", async () => {
+  const harness = createHarness();
+  const payload = {
+    ...validPayload,
+    record: {
+      ...validPayload.record,
+      email: "forged@example.test",
+      full_name: "Forged name",
+      pet_names: "Forged pet",
+    },
+  };
+  assertEquals((await harness.handler(webhookRequest(payload))).status, 200);
+  for (const request of harness.resendRequests()) {
+    assertStringExcludes(String(request.init.body), [
+      "forged@example.test",
+      "Forged name",
+      "Forged pet",
+    ]);
+  }
+});
+
+Deno.test("lookup failures and invalid stored recipients do not send", async () => {
+  for (const options of [{ lookupFails: true }, { invalidStoredEmail: true }]) {
+    const harness = createHarness(options);
+    assert((await harness.handler(webhookRequest())).status >= 400);
+    assertEquals(harness.resendCount(), 0);
+  }
+});
+
+Deno.test("receipt escapes names and handles missing names, recurring care, and undecided dates", () => {
+  const event = {
+    inquiryId: INQUIRY_ID,
+    receivedAt: validPayload.record.created_at,
+    receivedAtForClaim: validPayload.record.created_at,
+  };
+  const details = {
+    ...validPayload.record,
+    full_name: '<script>alert("name")</script>',
+    pet_names: '<img src=x onerror="pet">',
+    timing_type: "recurring",
+    recurring_schedule: "Weekdays <at noon>",
+  };
+  const receipt = buildEmailContent(event, details, "https://example.test/admin", "client");
+  assertStringExcludes(receipt.html, ["<script>", "<img", "https://example.test/admin"]);
+  assert(receipt.html.includes("&lt;at noon&gt;"));
+  const undecided = buildEmailContent(
+    event,
+    { ...details, pet_names: null, timing_type: "not_sure" },
+    undefined,
+    "client",
+  );
+  assert(undecided.text.includes("Not provided"));
+  assert(undecided.text.includes("Not sure yet"));
 });
