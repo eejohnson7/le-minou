@@ -84,6 +84,7 @@ export default function HeroSection() {
         </Box>
 
         <EditorialImageSlot
+          mediaSx={{ aspectRatio: { xs: "3 / 4", md: "4 / 5" } }}
           sx={{
             width: { xs: "calc(100% - 1rem)", sm: "min(84%, 470px)", md: "100%" },
             maxWidth: 450,

@@ -318,24 +318,47 @@ export function buildEmailContent(
       ...(ownerLink ? [`Open admin: ${ownerLink}`] : []),
       ...(audience === "client" ? ["", "You can reply to this email with questions."] : []),
     ].join("\n"),
-    html: [
-      '<div style="font-family:Arial,sans-serif;color:#292126;line-height:1.6">',
-      '<p style="color:#980061;font-weight:bold">Le Minou</p>',
-      `<h1 style="font-family:Georgia,serif;font-size:26px">${heading}</h1>`,
-      `<p>${escapeHtml(intro)}</p>`,
-      ...rows.map(([label, value]) =>
-        `<p><strong>${label}:</strong> ${escapeHtml(value).replace(/\r?\n/g, "<br>")}</p>`
-      ),
-      `<p><strong>Inquiry reference:</strong> ${escapeHtml(event.inquiryId)}<br>`,
-      `<strong>Received:</strong> ${escapeHtml(event.receivedAt)}</p>`,
-      ownerLink
-        ? `<p><a href="${
-          escapeHtml(ownerLink)
-        }" style="display:inline-block;background:#980061;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Open admin</a></p>`
-        : "",
-      audience === "client" ? "<p>You can reply to this email with questions.</p>" : "",
-      "</div>",
-    ].join(""),
+    html: audience === "client"
+      ? [
+        '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>',
+        '<body style="margin:0;padding:0;background:#f7edf1;color:#292126;font-family:Arial,sans-serif;line-height:1.6">',
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7edf1"><tr><td align="center" style="padding:24px 12px">',
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fffdfb;border:1px solid #e5d2dc;border-radius:12px"><tr><td style="padding:28px 24px">',
+        '<p style="margin:0 0 20px;color:#980061;font-family:Georgia,serif;font-size:30px;font-weight:bold">Le Minou</p>',
+        '<h1 style="margin:0 0 12px;font-family:Georgia,serif;font-size:28px;line-height:1.2">Your request is in.</h1>',
+        `<p style="margin:0 0 24px">${escapeHtml(intro)}</p>`,
+        '<h2 style="margin:0 0 12px;color:#980061;font-size:16px">Your request</h2>',
+        '<table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;table-layout:fixed">',
+        ...rows.map(([label, value]) =>
+          `<tr><th scope="row" width="32%" align="left" valign="top" style="padding:10px 8px 10px 0;border-bottom:1px solid #ecdfe5;font-size:14px;font-weight:bold">${label}</th><td valign="top" style="padding:10px 0;border-bottom:1px solid #ecdfe5;font-size:14px;overflow-wrap:anywhere;word-break:break-word">${
+            escapeHtml(value).replace(/\r?\n/g, "<br>")
+          }</td></tr>`
+        ),
+        "</table>",
+        '<p style="margin:24px 0 4px">Questions or changes? Just reply to this email.</p>',
+        '<p style="margin:0;color:#980061;font-weight:bold">— Erin</p>',
+        `<p style="margin:24px 0 0;color:#65555e;font-size:12px;overflow-wrap:anywhere;word-break:break-word">Request reference: ${
+          escapeHtml(event.inquiryId)
+        }<br>Received: ${escapeHtml(event.receivedAt)}</p>`,
+        "</td></tr></table></td></tr></table></body></html>",
+      ].join("")
+      : [
+        '<div style="font-family:Arial,sans-serif;color:#292126;line-height:1.6">',
+        '<p style="color:#980061;font-weight:bold">Le Minou</p>',
+        `<h1 style="font-family:Georgia,serif;font-size:26px">${heading}</h1>`,
+        `<p>${escapeHtml(intro)}</p>`,
+        ...rows.map(([label, value]) =>
+          `<p><strong>${label}:</strong> ${escapeHtml(value).replace(/\r?\n/g, "<br>")}</p>`
+        ),
+        `<p><strong>Inquiry reference:</strong> ${escapeHtml(event.inquiryId)}<br>`,
+        `<strong>Received:</strong> ${escapeHtml(event.receivedAt)}</p>`,
+        ownerLink
+          ? `<p><a href="${
+            escapeHtml(ownerLink)
+          }" style="display:inline-block;background:#980061;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:bold">Open admin</a></p>`
+          : "",
+        "</div>",
+      ].join(""),
   };
 }
 
