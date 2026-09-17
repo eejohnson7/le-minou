@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField, Typography } from "@mui/material";
 import { supabase } from "../../utils/supabase";
 import { STATUSES, petLabel, receivedLabel, timingLabel, titleCase } from "./requestLabels";
+import { clientReplyUrl } from "./clientReply";
 
 const serviceLabels = { "30-MINUTE VISIT": "30-min cat visit", "60-MINUTE VISIT": "60-min cat visit", "DOG WALK": "30-min dog walk", "60-MINUTE DOG WALK": "60-min dog walk" };
 export default function RequestDetail({ id, onClose, onSaved }) {
@@ -43,6 +44,7 @@ export default function RequestDetail({ id, onClose, onSaved }) {
     ["Care", request.services.map(value => serviceLabels[value] || value).join(", ")],
     ["When", timingLabel(request)], ["About their pets", request.pet_routine_notes]
   ] : [];
+  const replyUrl = request ? clientReplyUrl(request.email) : "";
   return (
     <Dialog open fullWidth maxWidth="sm" onClose={busy ? undefined : onClose} aria-labelledby="request-detail-title">
       <DialogTitle id="request-detail-title" sx={{ fontFamily: "var(--font-display)" }}>{request?.full_name || "Care request"}</DialogTitle>
@@ -51,6 +53,8 @@ export default function RequestDetail({ id, onClose, onSaved }) {
         {!request && !error && <CircularProgress aria-label="Loading request" />}
         {!request && error && <Button onClick={() => { setError(""); setAttempt(value => value + 1); }}>Try again</Button>}
         {request && <>
+          {replyUrl && <Button component="a" href={replyUrl}
+            variant="plum-outlined" disabled={busy} sx={{ mb: 3 }}>Reply to client</Button>}
           <Box component="dl" sx={{ m: 0, mb: 3 }}>
             {details.filter(([, value]) => value).map(([label, value]) => <Box key={label} sx={{ mb: 2 }}>
               <Typography component="dt" sx={{ fontWeight: 700 }}>{label}</Typography>
