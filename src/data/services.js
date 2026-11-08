@@ -12,7 +12,8 @@ const serviceByLabel = (label) => SERVICES.find((service) => service.label === l
 
 export const ADDITIONAL_RATES = [
   { label: "Additional cat", price: "+$2 per visit" },
-  { label: "Additional dog", price: "+$5 per walk" }
+  { label: "Additional dog", price: "+$5 per walk" },
+  { label: "Holiday rate", price: "+$5 per visit or walk" }
 ];
 
 export const SERVICE_DETAILS = [

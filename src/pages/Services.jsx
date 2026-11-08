@@ -91,7 +91,7 @@ export default function Services() {
               Additional rates.
             </Typography>
             <Typography sx={{ color: "var(--muted-ink)", lineHeight: 1.75, maxWidth: 430 }}>
-              Added to the visit or walk for each extra pet.
+              Extra-pet fees apply to each additional pet. The holiday fee applies once per appointment on designated holidays.
             </Typography>
           </Box>
 
