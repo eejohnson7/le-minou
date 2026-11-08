@@ -65,7 +65,7 @@ export default function RequestCare() {
 
           <Box sx={{ borderLeft: { md: "1px solid var(--plum-line)" }, pl: { md: 4 }, pb: { md: 0.5 } }}>
             <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.06rem" }, lineHeight: 1.78 }}>
-              Tell me what you need. I’ll email you about availability.
+              Tell me what your pet needs in Lakeview East. I’ll email you about availability.
             </Typography>
           </Box>
         </PageContainer>

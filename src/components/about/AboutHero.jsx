@@ -69,7 +69,7 @@ export default function AboutHero() {
             }}
           >
             <Typography sx={{ color: "var(--ink)", fontSize: { xs: "1.05rem", md: "1.16rem" }, fontWeight: 700, lineHeight: 1.7 }}>
-              I run Le Minou, a cat care and dog walking service on Chicago’s North Side.
+              I run Le Minou, a cat sitting and dog walking service in Lakeview East, Chicago.
             </Typography>
           </Box>
         </Box>

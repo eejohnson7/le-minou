@@ -35,7 +35,7 @@ export default function HeroSection() {
       >
         <Box sx={{ maxWidth: 760, position: "relative", zIndex: 1 }}>
           <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: { xs: 1, sm: 1.5 }, mb: 2 }}>
-            <SectionEyebrow>North Side Chicago</SectionEyebrow>
+            <SectionEyebrow>Lakeview East, Chicago</SectionEyebrow>
           </Box>
           <Typography
             id="home-title"

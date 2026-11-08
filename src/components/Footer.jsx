@@ -26,7 +26,7 @@ export default function Footer() {
               Le Minou
             </Typography>
             <Typography sx={{ color: "rgba(255, 253, 251, 0.7)", fontSize: "0.98rem", lineHeight: 1.7, mt: 2 }}>
-              Owner-operated cat care, dog walking, and thoughtful in-home pet care on Chicago&apos;s North Side.
+              Owner-operated cat sitting and dog walking in Lakeview East, Chicago.
             </Typography>
           </Box>
 
@@ -55,7 +55,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Le Minou
           </Typography>
           <Typography sx={{ color: "rgba(255, 253, 251, 0.52)", fontSize: "0.78rem" }}>
-            Chicago, Illinois
+            Lakeview East, Chicago
           </Typography>
         </Box>
       </PageContainer>
