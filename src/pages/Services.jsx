@@ -44,7 +44,7 @@ export default function Services() {
           </Box>
           <Box sx={{ borderLeft: { md: "1px solid var(--plum-line)" }, pl: { md: 4 }, pb: { md: 0.75 } }}>
             <Typography sx={{ color: "var(--muted-ink)", fontSize: { xs: "1rem", md: "1.08rem" }, lineHeight: 1.75, mb: 2.5 }}>
-              Cat visits and dog walks, with care from Erin.
+              Cat visits and dog walks in Lakeview East, with care from Erin.
             </Typography>
             <CtaLink to="/request-care">Request care</CtaLink>
           </Box>
