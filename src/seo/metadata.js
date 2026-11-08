@@ -5,7 +5,7 @@ export const publicPages = {
   },
   "/services": {
     title: "Services & Pricing | Le Minou",
-    description: "Explore Le Minou’s cat visits, dog walks, pricing, and extra charges. Find the right care for your pet with Erin."
+    description: "Explore Le Minou’s cat visits, dog walks, and pricing. Find the right care for your pet with Erin."
   },
   "/about": {
     title: "About Erin | Le Minou",
