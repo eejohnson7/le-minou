@@ -10,15 +10,17 @@ export const servicesForPetType = (petType) =>
 
 const serviceByLabel = (label) => SERVICES.find((service) => service.label === label);
 
-const additionalCatFee = "+$2 per additional cat, per visit.";
-const additionalDogFee = "+$5 per additional dog, per walk.";
+export const ADDITIONAL_RATES = [
+  { label: "Additional cat", price: "+$2 per visit" },
+  { label: "Additional dog", price: "+$5 per walk" }
+];
 
 export const SERVICE_DETAILS = [
   {
     number: "01",
     title: "Cat & Home Visits",
     description:
-      `Feeding, fresh litter, and company for your cat, plus small tasks around the home. ${additionalCatFee}`,
+      "Feeding, fresh litter, and company for your cat, plus small tasks around the home.",
     prices: [
       { label: "30-minute visit", service: serviceByLabel("30-MINUTE VISIT") },
       { label: "60-minute visit", service: serviceByLabel("60-MINUTE VISIT") }
@@ -28,7 +30,7 @@ export const SERVICE_DETAILS = [
     number: "02",
     title: "Dog Walks",
     description:
-      `A walk at your dog’s pace, with time to sniff and explore. You’ll get an update afterward. ${additionalDogFee}`,
+      "A walk at your dog’s pace, with time to sniff and explore. You’ll get an update afterward.",
     prices: [
       { label: "30-minute walk", service: serviceByLabel("DOG WALK") },
       { label: "60-minute walk", service: serviceByLabel("60-MINUTE DOG WALK") }
@@ -40,7 +42,7 @@ export const HOMEPAGE_SERVICES = SERVICE_DETAILS.map(({ number, title, prices },
   number,
   title,
   description: index === 0
-    ? `Food, fresh litter, and company for your cat. ${additionalCatFee}`
-    : `A walk at your dog’s pace, with time to sniff and explore. ${additionalDogFee}`,
+    ? "Food, fresh litter, and company for your cat."
+    : "A walk at your dog’s pace, with time to sniff and explore.",
   prices: prices.map(({ label, service }) => ({ label, value: service?.price }))
 }));

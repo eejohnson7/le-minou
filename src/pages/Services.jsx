@@ -4,7 +4,7 @@ import ServiceDetail from "../components/services/ServiceDetail";
 import CtaLink from "../components/layout/CtaLink";
 import PageContainer from "../components/layout/PageContainer";
 import Section from "../components/layout/Section";
-import { SERVICE_DETAILS } from "../data/services";
+import { ADDITIONAL_RATES, SERVICE_DETAILS } from "../data/services";
 
 export default function Services() {
   return (
@@ -69,6 +69,58 @@ export default function Services() {
           {SERVICE_DETAILS.map((service, index) => (
             <ServiceDetail key={service.number} service={service} index={index} />
           ))}
+        </Box>
+
+        <Box
+          aria-labelledby="additional-rates-title"
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "minmax(260px, 0.8fr) minmax(0, 1.2fr)" },
+            gap: { xs: 3, md: 9 },
+            alignItems: "start",
+            mt: { xs: 7, md: 10 }
+          }}
+        >
+          <Box>
+            <Typography
+              id="additional-rates-title"
+              component="h2"
+              variant="h2"
+              sx={{ color: "var(--ink)", fontSize: { xs: "2.25rem", md: "3rem" }, lineHeight: 1.02, mb: 1.5 }}
+            >
+              Additional rates.
+            </Typography>
+            <Typography sx={{ color: "var(--muted-ink)", lineHeight: 1.75, maxWidth: 430 }}>
+              Added to the visit or walk for each extra pet.
+            </Typography>
+          </Box>
+
+          <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, borderBottom: "1px solid var(--plum-line)" }}>
+            {ADDITIONAL_RATES.map((rate, index) => (
+              <Box
+                component="li"
+                key={rate.label}
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "2.5rem minmax(0, 1fr) auto",
+                  alignItems: "baseline",
+                  gap: { xs: 1, sm: 2 },
+                  borderTop: "1px solid var(--plum-line)",
+                  py: { xs: 2.5, sm: 3 }
+                }}
+              >
+                <Typography aria-hidden="true" sx={{ color: "var(--plum)", fontFamily: "monospace", fontSize: "0.7rem", fontWeight: 700 }}>
+                  {String(index + 1).padStart(2, "0")}
+                </Typography>
+                <Typography sx={{ color: "var(--ink)", fontFamily: "var(--font-display)", fontSize: { xs: "1.25rem", sm: "1.55rem" }, fontWeight: 700 }}>
+                  {rate.label}
+                </Typography>
+                <Typography sx={{ color: "var(--ink)", fontSize: { xs: "0.9rem", sm: "1rem" }, fontWeight: 700, textAlign: "right" }}>
+                  {rate.price}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Section>
 
